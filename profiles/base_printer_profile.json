@@ -1,0 +1,57 @@
+{
+  // ===========================
+  // BASE PRINTER PROFILE
+  // ===========================
+  // Use this file as a template to calibrate a new printer or paper type.
+  // Copy and rename it (e.g. my_printer_A4_200g.json)
+  // Make sure you remove all comments before using it
+
+  "paper": {
+    // Paper size in millimeters
+    // A4 = 297 x 210 mm
+    "width_mm": 297.0,
+    "height_mm": 210.0,
+
+    // Page orientation:
+    //  - "landscape" → horizontal layout
+    //  - "portrait"  → vertical layout
+    "orientation": "landscape"
+  },
+
+  "margins": {
+    // Internal margins in millimeters
+    // Adjust these values if your printer cannot print borderless.
+    "x_mm": 0.0,
+    "y_mm": 0.0
+  },
+
+  // Paper flip mode when printing double-sided:
+  //  - "long"  → flip on the long edge (like turning pages in a book)
+  //  - "short" → flip on the short edge (like flipping a notepad)
+  "flip_mode": "long",
+
+  "back_corrections": {
+    // Corrections applied to the back side only
+    // These values compensate for the physical misalignment
+    // introduced by the printer duplex mechanism.
+
+    // Rotation in degrees (°)
+    // Positive value = clockwise rotation
+    // Example: 0.3 means the printer feeds the paper
+    // with a 0.3° counterclockwise skew
+    "extra_rot_deg": 0.00,
+
+    // Horizontal shift in millimeters
+    // Positive value = move the back to the right
+    // Negative value = move the back to the left
+    "shift_x_mm": 0.0,
+
+    // Vertical shift in millimeters
+    // Positive value = move the back downward
+    // Negative value = move the back upward
+    "shift_y_mm": 0.0
+  },
+
+  "_notes": "Base template. Fill in these values after calibrating using the FRONT/BACK test sheets."
+}
+  

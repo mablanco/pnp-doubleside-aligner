@@ -1,0 +1,22 @@
+{
+  "paper": {
+    "width_mm": 210.0,
+    "height_mm": 297.0,
+    "orientation": "portrait"
+  },
+  "margins": {
+    "x_mm": 0.0,
+    "y_mm": 0.0
+  },
+  "flip_mode": "short",
+  "back_corrections": {
+    "extra_rot_deg": 0.3,
+    "shift_x_mm": 1.0,
+    "shift_y_mm": 1.0
+  },
+  "_notes": [
+    "Example printer calibration profile.",
+    "Adjust back_corrections values to match your printer.",
+    "Recalibrate if you change paper, tray, duplex mode or printer."
+  ]
+}
