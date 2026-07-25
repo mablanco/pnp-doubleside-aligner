@@ -1,19 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 → 1.2.0 (MINOR: AI-assisted evolution + repository hygiene)
-- Modified principles: none renamed
-- Added sections / guidance:
-  - Project Context (existing human-built tool; AI tooling integrated later)
-  - VIII. Repository Hygiene & Secrets
-  - Development Workflow: AI-assisted changes must preserve legacy contracts
+- Version change: 1.2.0 → 1.2.1 (PATCH: ignore local Cursor skills; drop scratch-file noise)
+- Modified principles:
+  - VIII. Repository Hygiene & Secrets → .cursor/skills/ MUST stay untracked
+- Added sections: none
 - Removed sections: none
 - Templates / docs requiring updates:
-  - .specify/templates/plan-template.md ✅ updated (Constitution Check gates)
-  - README.md ✅ updated (AI-assisted development note)
-  - .gitignore ✅ hardened (secrets, venvs, local profiles, AI scratch)
-  - .specify/templates/spec-template.md ✅ no change required
-  - .specify/templates/tasks-template.md ✅ no change required
-- Follow-up TODOs: rotate any local Sonar token if it was ever shared outside this machine
+  - .gitignore ✅ updated (.cursor/skills/; removed gemini-code-* pattern)
+  - .specify/templates/plan-template.md ✅ hygiene gate clarified
+  - README.md ✅ no change required
+- Follow-up TODOs: none
 -->
 
 # PnP Double-Side Aligner Constitution
@@ -140,8 +136,10 @@ committed. `.gitignore` is part of project governance: when adding tooling
 the same change set. Never place API keys, Sonar tokens, or `.env` values in
 tracked files, specs, or agent prompts that will be committed.
 
-Tracked Spec Kit / Cursor project assets (for example `.specify/` and shared
-`.cursor/skills` or rules) are allowed when they contain no secrets.
+Tracked Spec Kit assets under `.specify/` and shared Cursor rules under
+`.cursor/rules/` are allowed when they contain no secrets. Local Cursor
+skills under `.cursor/skills/` MUST remain gitignored (regenerated or
+machine-local tooling, not project source).
 
 **Rationale**: AI-assisted workflows increase the chance of accidental leaks;
 ignore rules and review habits are the first control.
@@ -203,4 +201,4 @@ simplicity MUST be recorded in the plan's Complexity Tracking table with
 justification. Runtime guidance for operators lives in `README.md` and
 `docs/calibration_guide.md`; this file governs how the project evolves.
 
-**Version**: 1.2.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25
+**Version**: 1.2.1 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25

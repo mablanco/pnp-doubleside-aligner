@@ -61,7 +61,7 @@ Thumbs.db
 !.vscode/settings.json.example
 
 # AI / agent local scratch (do not leak prompts with secrets)
-gemini-code-*.md
+.cursor/skills/
 *.local.md
 .agent/
 .agents/scratch/

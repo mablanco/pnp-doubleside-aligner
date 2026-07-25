@@ -61,8 +61,9 @@
   or equivalent verification when touching that code.
 - **Separation of Concerns**: Keep pure geometry independent of I/O; keep
   profile parsing decoupled from the transform engine.
-- **Repository hygiene**: No secrets, tokens, personal profiles, or local
-  AI/tool scratch in commits; update `.gitignore` when adding tooling.
+- **Repository hygiene**: No secrets, tokens, personal profiles, local
+  `.cursor/skills/`, or AI/tool scratch in commits; update `.gitignore`
+  when adding tooling.
 - **Safe I/O & docs**: Distinct input/output paths; safe temp saves; update
   README / calibration docs when user-visible behavior or profile schema
   changes.
