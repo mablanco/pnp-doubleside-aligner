@@ -31,8 +31,8 @@ enablement tests exist.
 
 **Purpose**: Confirm workspace ready for smart-detect work (no new deps)
 
-- [ ] T001 Verify existing stack (`requirements.txt`, `requirements-dev.txt`) already provides PyMuPDF, Pillow, pytest; note no new runtime deps for this feature in `specs/002-smart-detect/plan.md` checklist comment or skip if already true
-- [ ] T002 [P] Skim `tools/pnp_batch_align.py` disable gate and incomplete `avg_sim_block` references; list touch points in a short note under `specs/002-smart-detect/` only if needed for implementers (optional; otherwise proceed to fixtures)
+- [X] T001 Verify existing stack (`requirements.txt`, `requirements-dev.txt`) already provides PyMuPDF, Pillow, pytest; note no new runtime deps for this feature in `specs/002-smart-detect/plan.md` checklist comment or skip if already true
+- [X] T002 [P] Skim `tools/pnp_batch_align.py` disable gate and incomplete `avg_sim_block` references; list touch points in a short note under `specs/002-smart-detect/` only if needed for implementers (optional; otherwise proceed to fixtures)
 
 ---
 
@@ -42,11 +42,11 @@ enablement tests exist.
 
 **⚠️ CRITICAL**: Do not remove the `--auto-detect-smart` disable gate until this phase’s fixtures exist and failing enablement tests are written (Phase 3)
 
-- [ ] T003 [P] Create and commit even-page fronts-then-backs fixture PDF at `tests/fixtures/sample_fronts_then_backs.pdf` (distinct shared-back second half vs interleaved sample)
-- [ ] T004 [P] Create and commit single-page fixture PDF at `tests/fixtures/sample_single.pdf`
-- [ ] T005 [P] Create and commit ambiguous/inconclusive even-page fixture at `tests/fixtures/sample_ambiguous_even.pdf` (both cluster scores weak or tied under thresholds)
-- [ ] T006 [P] Extend `tests/fixtures/README.md` with provenance for the new smart-detect fixtures
-- [ ] T007 Add pytest fixtures in `tests/conftest.py` for `sample_fronts_then_backs`, `sample_single`, and `sample_ambiguous_even`
+- [X] T003 [P] Create and commit even-page fronts-then-backs fixture PDF at `tests/fixtures/sample_fronts_then_backs.pdf` (distinct shared-back second half vs interleaved sample)
+- [X] T004 [P] Create and commit single-page fixture PDF at `tests/fixtures/sample_single.pdf`
+- [X] T005 [P] Create and commit ambiguous/inconclusive even-page fixture at `tests/fixtures/sample_ambiguous_even.pdf` (both cluster scores weak or tied under thresholds)
+- [X] T006 [P] Extend `tests/fixtures/README.md` with provenance for the new smart-detect fixtures
+- [X] T007 Add pytest fixtures in `tests/conftest.py` for `sample_fronts_then_backs`, `sample_single`, and `sample_ambiguous_even`
 
 **Checkpoint**: New fixtures committed; `pytest` still discovers existing suite; disable gate still present
 
@@ -63,18 +63,18 @@ fronts_then_backs + single + odd; see `specs/002-smart-detect/quickstart.md`
 
 ### Tests for User Story 1 (write first; expect fail while disabled / incomplete)
 
-- [ ] T008 [P] [US1] Unit tests for `name_hint_to_order` and `detect_order_by_page_count` in `tests/unit/test_smart_detect.py`
-- [ ] T009 [P] [US1] Unit tests for `avg_sim_block` (synthetic fingerprint lists) in `tests/unit/test_smart_detect.py`
-- [ ] T010 [P] [US1] Unit tests for common-back cluster decision (odd-cluster vs second-half; thresholds T=0.80, M=0.03) in `tests/unit/test_smart_detect.py`
-- [ ] T011 [US1] Replace disable-oriented assertions in `tests/integration/test_batch_smart_detect.py` with enablement tests: `--auto-detect-smart` must not print unavailable/disabled; classify `sample_interleaved` → interleaved and `sample_fronts_then_backs` → fronts_then_backs; single → `single_sided`; odd → `last_back`
+- [X] T008 [P] [US1] Unit tests for `name_hint_to_order` and `detect_order_by_page_count` in `tests/unit/test_smart_detect.py`
+- [X] T009 [P] [US1] Unit tests for `avg_sim_block` (synthetic fingerprint lists) in `tests/unit/test_smart_detect.py`
+- [X] T010 [P] [US1] Unit tests for common-back cluster decision (odd-cluster vs second-half; thresholds T=0.80, M=0.03) in `tests/unit/test_smart_detect.py`
+- [X] T011 [US1] Replace disable-oriented assertions in `tests/integration/test_batch_smart_detect.py` with enablement tests: `--auto-detect-smart` must not print unavailable/disabled; classify `sample_interleaved` → interleaved and `sample_fronts_then_backs` → fronts_then_backs; single → `single_sided`; odd → `last_back`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Implement missing `avg_sim_block` helper in `tools/pnp_batch_align.py`
-- [ ] T013 [US1] Replace pair-vs-halves `decide_by_visual_similarity` with common-back cluster rule per `specs/002-smart-detect/research.md` R1 in `tools/pnp_batch_align.py`
-- [ ] T014 [US1] Wire `detect_order_smart` to use new decision path + existing fingerprints/cosine in `tools/pnp_batch_align.py`
-- [ ] T015 [US1] Remove early `SystemExit` disable gate for `--auto-detect-smart` and restore argparse help text as available (experimental batch) in `tools/pnp_batch_align.py`
-- [ ] T016 [US1] Confirm `tests/unit/test_smart_detect.py` and enablement cases in `tests/integration/test_batch_smart_detect.py` pass for US1 fixtures
+- [X] T012 [US1] Implement missing `avg_sim_block` helper in `tools/pnp_batch_align.py`
+- [X] T013 [US1] Replace pair-vs-halves `decide_by_visual_similarity` with common-back cluster rule per `specs/002-smart-detect/research.md` R1 in `tools/pnp_batch_align.py`
+- [X] T014 [US1] Wire `detect_order_smart` to use new decision path + existing fingerprints/cosine in `tools/pnp_batch_align.py`
+- [X] T015 [US1] Remove early `SystemExit` disable gate for `--auto-detect-smart` and restore argparse help text as available (experimental batch) in `tools/pnp_batch_align.py`
+- [X] T016 [US1] Confirm `tests/unit/test_smart_detect.py` and enablement cases in `tests/integration/test_batch_smart_detect.py` pass for US1 fixtures
 
 **Checkpoint**: Smart detect flag usable; gold interleaved vs halves not swapped (SC-005)
 
@@ -90,16 +90,16 @@ tie/fallback + even-default; unreadable PDF → `open-fallback` without NameErro
 
 ### Tests for User Story 2
 
-- [ ] T017 [P] [US2] Unit/integration cases for name-hint precedence over visual cues in `tests/unit/test_smart_detect.py` and/or `tests/integration/test_batch_smart_detect.py`
-- [ ] T018 [P] [US2] Integration test: `sample_ambiguous_even.pdf` + `--even-default fronts_then_backs` yields fallback reason and that order in `tests/integration/test_batch_smart_detect.py`
-- [ ] T019 [P] [US2] Test open/unreadable path returns `open-fallback` (or clear error) without `NameError`/`avg_sim_block` crash in `tests/unit/test_smart_detect.py` or `tests/integration/test_batch_smart_detect.py`
+- [X] T017 [P] [US2] Unit/integration cases for name-hint precedence over visual cues in `tests/unit/test_smart_detect.py` and/or `tests/integration/test_batch_smart_detect.py`
+- [X] T018 [P] [US2] Integration test: `sample_ambiguous_even.pdf` + `--even-default fronts_then_backs` yields fallback reason and that order in `tests/integration/test_batch_smart_detect.py`
+- [X] T019 [P] [US2] Test open/unreadable path returns `open-fallback` (or clear error) without `NameError`/`avg_sim_block` crash in `tests/unit/test_smart_detect.py` or `tests/integration/test_batch_smart_detect.py`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Ensure reason taxonomy prefixes (`name-hint:`, `pages:`, `visual:`, `visual:tie`, `open-fallback`) match `specs/002-smart-detect/data-model.md` in `tools/pnp_batch_align.py`
-- [ ] T021 [US2] Implement page-sampling plan for N>40 (evenly spaced ≤40 indices) in `tools/pnp_batch_align.py` per research R3
-- [ ] T022 [US2] Add unit coverage for sampling index selection in `tests/unit/test_smart_detect.py`
-- [ ] T023 [US2] Confirm US2 tests pass; worker non-zero exits still propagate from batch loop in `tools/pnp_batch_align.py`
+- [X] T020 [US2] Ensure reason taxonomy prefixes (`name-hint:`, `pages:`, `visual:`, `visual:tie`, `open-fallback`) match `specs/002-smart-detect/data-model.md` in `tools/pnp_batch_align.py`
+- [X] T021 [US2] Implement page-sampling plan for N>40 (evenly spaced ≤40 indices) in `tools/pnp_batch_align.py` per research R3
+- [X] T022 [US2] Add unit coverage for sampling index selection in `tests/unit/test_smart_detect.py`
+- [X] T023 [US2] Confirm US2 tests pass; worker non-zero exits still propagate from batch loop in `tools/pnp_batch_align.py`
 
 **Checkpoint**: Fallbacks honest; no crash on open failure; sampling documented in code comments
 
@@ -115,10 +115,10 @@ auditable; suite is the source of truth
 
 ### Tests / docs for User Story 3
 
-- [ ] T024 [P] [US3] Assert status stdout includes `order=` and reason for each PDF in `tests/integration/test_batch_smart_detect.py`
-- [ ] T025 [US3] Update `tools/README.md`: `--auto-detect-smart` available, precedence (name → page-count → content → even-default), sampling note, experimental batch label
-- [ ] T026 [P] [US3] Update root `README.md` only if it still claims smart-detect is disabled
-- [ ] T027 [US3] Update argparse description/help in `tools/pnp_batch_align.py` to match docs (available, experimental)
+- [X] T024 [P] [US3] Assert status stdout includes `order=` and reason for each PDF in `tests/integration/test_batch_smart_detect.py`
+- [X] T025 [US3] Update `tools/README.md`: `--auto-detect-smart` available, precedence (name → page-count → content → even-default), sampling note, experimental batch label
+- [X] T026 [P] [US3] Update root `README.md` only if it still claims smart-detect is disabled
+- [X] T027 [US3] Update argparse description/help in `tools/pnp_batch_align.py` to match docs (available, experimental)
 
 **Checkpoint**: Docs no longer say disabled; FR-011 satisfied
 
@@ -126,9 +126,9 @@ auditable; suite is the source of truth
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T028 [P] Ensure main PDF suite still passes without depending on smart-detect changes: `python -m pytest tests/ -v`
-- [ ] T029 Run validation steps from `specs/002-smart-detect/quickstart.md` and fix any gaps
-- [ ] T030 [P] Confirm `pnp_double_with_profile_pdf.py` was not behaviorally changed for this feature (diff review)
+- [X] T028 [P] Ensure main PDF suite still passes without depending on smart-detect changes: `python -m pytest tests/ -v`
+- [X] T029 Run validation steps from `specs/002-smart-detect/quickstart.md` and fix any gaps
+- [X] T030 [P] Confirm `pnp_double_with_profile_pdf.py` was not behaviorally changed for this feature (diff review)
 
 ---
 
