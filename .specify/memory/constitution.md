@@ -1,15 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: 1.2.0 → 1.2.1 (PATCH: ignore local Cursor skills; drop scratch-file noise)
+- Version change: 1.2.1 → 1.3.0 (MINOR: Spec Kit tooling vs project-state split)
 - Modified principles:
-  - VIII. Repository Hygiene & Secrets → .cursor/skills/ MUST stay untracked
+  - VIII. Repository Hygiene & Secrets → ignore specify-init regenerables;
+    track constitution, config, and template overrides only
 - Added sections: none
 - Removed sections: none
 - Templates / docs requiring updates:
-  - .gitignore ✅ updated (.cursor/skills/; removed gemini-code-* pattern)
-  - .specify/templates/plan-template.md ✅ hygiene gate clarified
-  - README.md ✅ no change required
-- Follow-up TODOs: none
+  - .gitignore ✅ regenerable Spec Kit paths ignored
+  - .specify/templates/overrides/{plan,tasks}-template.md ✅ project overrides
+  - README.md ✅ specify init restore note
+  - Stock .specify/templates|scripts|integrations|workflows|extensions/* untracked
+- Follow-up TODOs: contributors run `specify init --here --force` (or equivalent)
+  after clone to restore local tooling
 -->
 
 # PnP Double-Side Aligner Constitution
@@ -136,13 +139,25 @@ committed. `.gitignore` is part of project governance: when adding tooling
 the same change set. Never place API keys, Sonar tokens, or `.env` values in
 tracked files, specs, or agent prompts that will be committed.
 
-Tracked Spec Kit assets under `.specify/` and shared Cursor rules under
-`.cursor/rules/` are allowed when they contain no secrets. Local Cursor
-skills under `.cursor/skills/` MUST remain gitignored (regenerated or
-machine-local tooling, not project source).
+Spec Kit / Cursor split:
 
-**Rationale**: AI-assisted workflows increase the chance of accidental leaks;
-ignore rules and review habits are the first control.
+- **Track (project state)**: `.specify/memory/constitution.md`,
+  `.specify/extensions.yml`, `.specify/extensions/.registry`,
+  `.specify/init-options.json`, `.specify/integration.json`, and project
+  template overrides under `.specify/templates/overrides/`. Feature artifacts
+  under `specs/` when they exist.
+- **Do not track (regenerable / local)**: `.cursor/skills/`,
+  `.cursor/rules/specify-rules.mdc`, `.specify/scripts/`,
+  `.specify/integrations/`, `.specify/workflows/`, extension payloads under
+  `.specify/extensions/**` (except `.registry`), stock templates under
+  `.specify/templates/` (except `overrides/`), `.specify/feature.json`, and
+  `.specify/tmp/`.
+
+After cloning, restore local Spec Kit tooling with `specify init` (or the
+project's documented equivalent) before running Spec Kit commands.
+
+**Rationale**: AI-assisted workflows increase leak risk and tool churn;
+version project intent, not every file `specify init` can recreate.
 
 ## Additional Constraints
 
@@ -201,4 +216,4 @@ simplicity MUST be recorded in the plan's Complexity Tracking table with
 justification. Runtime guidance for operators lives in `README.md` and
 `docs/calibration_guide.md`; this file governs how the project evolves.
 
-**Version**: 1.2.1 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25
+**Version**: 1.3.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25

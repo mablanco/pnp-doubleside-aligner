@@ -24,6 +24,20 @@ If you contribute (human or AI-assisted):
 
 Project principles live in `.specify/memory/constitution.md`.
 
+### Spec Kit tooling after clone
+
+Git tracks project state (constitution, Spec Kit config, template overrides).
+Regenerable `specify init` assets (scripts, stock templates, skills, extension
+payloads, workflows) are gitignored. After cloning, restore local tooling, for
+example:
+
+```bash
+specify init --here --force --integration cursor-agent
+```
+
+Use the same integration options you normally use for this repo. Project
+template customizations live under `.specify/templates/overrides/`.
+
 ## Features
 
 - Corrects rotation (skew) and X/Y shift on back pages only

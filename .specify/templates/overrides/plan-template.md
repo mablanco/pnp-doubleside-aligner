@@ -4,7 +4,9 @@
 
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/speckit-plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit-plan` command. Project
+overrides live in `.specify/templates/overrides/` (stock templates are restored
+locally by `specify init` and are not committed).
 
 ## Summary
 
@@ -62,8 +64,9 @@
 - **Separation of Concerns**: Keep pure geometry independent of I/O; keep
   profile parsing decoupled from the transform engine.
 - **Repository hygiene**: No secrets, tokens, personal profiles, local
-  `.cursor/skills/`, or AI/tool scratch in commits; update `.gitignore`
-  when adding tooling.
+  `.cursor/skills/`, Spec Kit regenerable tooling (scripts, stock templates,
+  integrations, extension payloads, workflows), or AI/tool scratch in
+  commits; update `.gitignore` when adding tooling.
 - **Safe I/O & docs**: Distinct input/output paths; safe temp saves; update
   README / calibration docs when user-visible behavior or profile schema
   changes.

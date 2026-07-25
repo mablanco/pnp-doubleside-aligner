@@ -60,10 +60,27 @@ Thumbs.db
 !.vscode/extensions.json
 !.vscode/settings.json.example
 
-# AI / agent local scratch (do not leak prompts with secrets)
+# ---------------------------------------------------------------------------
+# Spec Kit / Cursor — regenerable tooling & local state (specify init)
+# Keep in git: constitution, extensions.yml, .registry, init/integration
+# JSON, and .specify/templates/overrides/*
+# ---------------------------------------------------------------------------
 .cursor/skills/
+.cursor/rules/specify-rules.mdc
 *.local.md
 .agent/
 .agents/scratch/
 _bmad-output/
+
 .specify/tmp/
+.specify/feature.json
+.specify/scripts/
+.specify/integrations/
+.specify/workflows/
+.specify/extensions/**
+!.specify/extensions/.registry
+
+# Stock templates restored by specify init; commit only project overrides
+.specify/templates/*
+!.specify/templates/overrides/
+!.specify/templates/overrides/**
