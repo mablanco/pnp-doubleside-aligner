@@ -34,10 +34,10 @@ the prior exit gate is met.
 
 **Purpose**: Test harness and dependency pins so characterization can run
 
-- [ ] T001 Create `tests/`, `tests/unit/`, `tests/integration/`, `tests/fixtures/`, and `tests/fixtures/golden/` directories with empty `__init__.py` where needed for imports
-- [ ] T002 [P] Add pinned main-stack `requirements.txt` (PyMuPDF, Pillow, ReportLab) at repository root
-- [ ] T003 [P] Add `requirements-dev.txt` with `pytest` at repository root
-- [ ] T004 [P] Ensure `.gitignore` keeps personal profiles, secrets, venvs, and *ad-hoc* generated alignment PDFs untracked, while allowing committed fixtures under `tests/fixtures/` and `tests/fixtures/golden/` (FR-020)
+- [x] T001 Create `tests/`, `tests/unit/`, `tests/integration/`, `tests/fixtures/`, and `tests/fixtures/golden/` directories with empty `__init__.py` where needed for imports
+- [x] T002 [P] Add pinned main-stack `requirements.txt` (PyMuPDF, Pillow, ReportLab) at repository root
+- [x] T003 [P] Add `requirements-dev.txt` with `pytest` at repository root
+- [x] T004 [P] Ensure `.gitignore` keeps personal profiles, secrets, venvs, and *ad-hoc* generated alignment PDFs untracked, while allowing committed fixtures under `tests/fixtures/` and `tests/fixtures/golden/` (FR-020)
 
 ---
 
@@ -47,12 +47,12 @@ the prior exit gate is met.
 
 **⚠️ CRITICAL**: No user-story implementation/fixes until this phase is complete
 
-- [ ] T005 Add `tests/conftest.py` with shared helpers (repo-root path, CLI runner via `subprocess` or importable `main`, temp output dirs)
-- [ ] T006 [P] Create and **commit** even-page interleaved sample PDF at `tests/fixtures/sample_interleaved.pdf` (minimum 2 pages; deterministic content suitable for golden diffs)
-- [ ] T007 [P] Create and **commit** odd-page sample PDF at `tests/fixtures/sample_odd.pdf` for `fronts_then_backs` / `--on-odd` cases
-- [ ] T008 [P] Create valid non-zero correction profile fixture at `tests/fixtures/profile_nonzero.json` (and shift-only variant `tests/fixtures/profile_shift_only.json`)
-- [ ] T009 [P] Create invalid/comment-bearing profile fixtures at `tests/fixtures/profile_invalid.json` and `tests/fixtures/profile_with_comments.json`
-- [ ] T010 Document fixture provenance, golden regeneration steps, and “do not commit personal/ad-hoc PDFs outside `tests/fixtures/`” in `tests/fixtures/README.md`
+- [x] T005 Add `tests/conftest.py` with shared helpers (repo-root path, CLI runner via `subprocess` or importable `main`, temp output dirs)
+- [x] T006 [P] Create and **commit** even-page interleaved sample PDF at `tests/fixtures/sample_interleaved.pdf` (minimum 2 pages; deterministic content suitable for golden diffs)
+- [x] T007 [P] Create and **commit** odd-page sample PDF at `tests/fixtures/sample_odd.pdf` for `fronts_then_backs` / `--on-odd` cases
+- [x] T008 [P] Create valid non-zero correction profile fixture at `tests/fixtures/profile_nonzero.json` (and shift-only variant `tests/fixtures/profile_shift_only.json`)
+- [x] T009 [P] Create invalid/comment-bearing profile fixtures at `tests/fixtures/profile_invalid.json` and `tests/fixtures/profile_with_comments.json`
+- [x] T010 Document fixture provenance, golden regeneration steps, and “do not commit personal/ad-hoc PDFs outside `tests/fixtures/`” in `tests/fixtures/README.md`
 
 **Checkpoint**: `python -m pip install -r requirements.txt -r requirements-dev.txt` works; `pytest` discovers an empty/minimal suite; two sample input PDFs are saved under `tests/fixtures/`
 
@@ -72,19 +72,19 @@ outputs
 
 ### Characterization tests (write first; expect failures on known bugs)
 
-- [ ] T011 [P] [US3] Unit tests for `mm_to_pt` in `tests/unit/test_units.py` importing from `pnp_double_with_profile_pdf.py`
-- [ ] T012 [P] [US3] Unit tests for `is_back_page` / effective totals for all page-order modes and odd policies in `tests/unit/test_page_order.py`
-- [ ] T013 [P] [US3] Unit tests for `load_profile(None)` → identity and missing-key axes → 0 in `tests/unit/test_profile_load.py` (assert desired contract; expect fail on sample defaults)
-- [ ] T014 [P] [US3] Unit tests for missing/invalid/comment profile path errors in `tests/unit/test_profile_load.py` (desired: actionable failure, not silent sample merge)
-- [ ] T015 [P] [US3] Unit tests for `build_back_matrix` / vector matrix construction (no `fitz.Matrix(rotation=…)`) in `tests/unit/test_vector_matrix.py`
-- [ ] T016 [P] [US3] Unit tests for raster sign helpers (+rot clockwise via PIL negate; +Y downward → ReportLab placement) in `tests/unit/test_raster_signs.py`
-- [ ] T017 [P] [US3] Integration test: vector mode with non-zero profile — backs move, fronts identity — in `tests/integration/test_vector_geometry.py`
-- [ ] T018 [P] [US3] Integration test: shift-only profile — vector backs ≠ identity copy — in `tests/integration/test_vector_geometry.py`
-- [ ] T019 [P] [US3] Integration test: `--mode auto` recoverable vector failure → stderr fallback + raster output in `tests/integration/test_auto_fallback.py`
-- [ ] T020 [P] [US3] Integration/CLI tests: missing PDF, missing `--profile` path, invalid/comment JSON → stderr + non-zero exit in `tests/integration/test_cli_errors.py`
-- [ ] T021 [P] [US3] Integration/CLI test: no profile / no overrides → reported identity corrections in `tests/integration/test_cli_identity.py`
-- [ ] T022 [P] [US3] Integration/CLI test: `--on-odd warn` emits stderr for odd `fronts_then_backs` in `tests/integration/test_odd_warn.py`
-- [ ] T023 [P] [US3] Integration/CLI test: batch `--auto-detect-smart` must not `NameError` (clear disable message) in `tests/integration/test_batch_smart_detect.py`
+- [x] T011 [P] [US3] Unit tests for `mm_to_pt` in `tests/unit/test_units.py` importing from `pnp_double_with_profile_pdf.py`
+- [x] T012 [P] [US3] Unit tests for `is_back_page` / effective totals for all page-order modes and odd policies in `tests/unit/test_page_order.py`
+- [x] T013 [P] [US3] Unit tests for `load_profile(None)` → identity and missing-key axes → 0 in `tests/unit/test_profile_load.py` (assert desired contract; expect fail on sample defaults)
+- [x] T014 [P] [US3] Unit tests for missing/invalid/comment profile path errors in `tests/unit/test_profile_load.py` (desired: actionable failure, not silent sample merge)
+- [x] T015 [P] [US3] Unit tests for `build_back_matrix` / vector matrix construction (no `fitz.Matrix(rotation=…)`) in `tests/unit/test_vector_matrix.py`
+- [x] T016 [P] [US3] Unit tests for raster sign helpers (+rot clockwise via PIL negate; +Y downward → ReportLab placement) in `tests/unit/test_raster_signs.py`
+- [x] T017 [P] [US3] Integration test: vector mode with non-zero profile — backs move, fronts identity — in `tests/integration/test_vector_geometry.py`
+- [x] T018 [P] [US3] Integration test: shift-only profile — vector backs ≠ identity copy — in `tests/integration/test_vector_geometry.py`
+- [x] T019 [P] [US3] Integration test: `--mode auto` recoverable vector failure → stderr fallback + raster output in `tests/integration/test_auto_fallback.py`
+- [x] T020 [P] [US3] Integration/CLI tests: missing PDF, missing `--profile` path, invalid/comment JSON → stderr + non-zero exit in `tests/integration/test_cli_errors.py`
+- [x] T021 [P] [US3] Integration/CLI test: no profile / no overrides → reported identity corrections in `tests/integration/test_cli_identity.py`
+- [x] T022 [P] [US3] Integration/CLI test: `--on-odd warn` emits stderr for odd `fronts_then_backs` in `tests/integration/test_odd_warn.py`
+- [x] T023 [P] [US3] Integration/CLI test: batch `--auto-detect-smart` must not `NameError` (clear disable message) in `tests/integration/test_batch_smart_detect.py`
 
 ### Golden sample outputs (refactor no-drift net)
 
@@ -92,10 +92,10 @@ outputs
 > silent no-ops as goldens. Initial files may be placeholders; **regenerate and
 > commit** after plan Phase 2 fixes (see T046) before structural refactor.
 
-- [ ] T024 [US3] Add PDF compare helper (byte-identical file compare, or deterministic content-stream/hash if metadata timestamps differ) in `tests/helpers/pdf_compare.py` and wire via `tests/conftest.py`
-- [ ] T025 [US3] Add golden generation script `tests/fixtures/generate_goldens.py` that runs the main CLI on the two sample inputs and writes baselines under `tests/fixtures/golden/` (at minimum: identity vector on `sample_interleaved.pdf`, and non-zero profile vector on the same input)
-- [ ] T026 [US3] Run generator (or document deferred regen) and **save** at least two golden output PDFs: `tests/fixtures/golden/out_identity_vector.pdf` and `tests/fixtures/golden/out_nonzero_vector.pdf`
-- [ ] T027 [US3] Integration test: live CLI output for those same two scenarios must be **identical** to the saved goldens in `tests/integration/test_golden_outputs.py` (gate for US5 refactor; may stay skipped/xfail until T046 regenerates post-fix goldens)
+- [x] T024 [US3] Add PDF compare helper (byte-identical file compare, or deterministic content-stream/hash if metadata timestamps differ) in `tests/helpers/pdf_compare.py` and wire via `tests/conftest.py`
+- [x] T025 [US3] Add golden generation script `tests/fixtures/generate_goldens.py` that runs the main CLI on the two sample inputs and writes baselines under `tests/fixtures/golden/` (at minimum: identity vector on `sample_interleaved.pdf`, and non-zero profile vector on the same input)
+- [x] T026 [US3] Run generator (or document deferred regen) and **save** at least two golden output PDFs: `tests/fixtures/golden/out_identity_vector.pdf` and `tests/fixtures/golden/out_nonzero_vector.pdf`
+- [x] T027 [US3] Integration test: live CLI output for those same two scenarios must be **identical** to the saved goldens in `tests/integration/test_golden_outputs.py` (gate for US5 refactor; may stay skipped/xfail until T046 regenerates post-fix goldens)
 
 **Checkpoint**: Suite runs; green only for already-correct behavior; red cases map to plan Phase 2 fix list; golden harness + ≥2 sample output paths exist under `tests/fixtures/golden/`
 
@@ -111,12 +111,12 @@ and `raster`/`auto`; characterization geometry/fallback tests from US3 pass
 
 ### Implementation
 
-- [ ] T028 [US1] Fix vector rotation construction to positional `fitz.Matrix(degrees)` (remove `rotation=`) in `pnp_double_with_profile_pdf.py` (`build_back_matrix` / related helpers)
-- [ ] T029 [US1] Apply back rotation+shift via a PyMuPDF placement API that actually transforms content (do not rely on ignored `matrix=` on `show_pdf_page`) in `pnp_double_with_profile_pdf.py`
-- [ ] T030 [US1] Replace non-existent `fitz.FitzError` handling with recoverable `(TypeError, RuntimeError, OSError, ValueError)` and stderr fallback notice + `raster_fallback` in `pnp_double_with_profile_pdf.py`
-- [ ] T031 [US1] Align raster rotation sign with calibration guide (negate angle for PIL clockwise contract) in `pnp_double_with_profile_pdf.py`
-- [ ] T032 [US1] Align raster Y placement with +Y-downward contract (ReportLab canvas conversion) in `pnp_double_with_profile_pdf.py`
-- [ ] T033 [US1] Re-run and confirm `tests/unit/test_vector_matrix.py`, `tests/unit/test_raster_signs.py`, `tests/integration/test_vector_geometry.py`, and `tests/integration/test_auto_fallback.py` pass
+- [x] T028 [US1] Fix vector rotation construction to positional `fitz.Matrix(degrees)` (remove `rotation=`) in `pnp_double_with_profile_pdf.py` (`build_back_matrix` / related helpers)
+- [x] T029 [US1] Apply back rotation+shift via a PyMuPDF placement API that actually transforms content (do not rely on ignored `matrix=` on `show_pdf_page`) in `pnp_double_with_profile_pdf.py`
+- [x] T030 [US1] Replace non-existent `fitz.FitzError` handling with recoverable `(TypeError, RuntimeError, OSError, ValueError)` and stderr fallback notice + `raster_fallback` in `pnp_double_with_profile_pdf.py`
+- [x] T031 [US1] Align raster rotation sign with calibration guide (negate angle for PIL clockwise contract) in `pnp_double_with_profile_pdf.py`
+- [x] T032 [US1] Align raster Y placement with +Y-downward contract (ReportLab canvas conversion) in `pnp_double_with_profile_pdf.py`
+- [x] T033 [US1] Re-run and confirm `tests/unit/test_vector_matrix.py`, `tests/unit/test_raster_signs.py`, `tests/integration/test_vector_geometry.py`, and `tests/integration/test_auto_fallback.py` pass
 
 **Checkpoint**: US1 acceptance scenarios / SC-001 geometry cases green; fronts unmodified
 
@@ -132,12 +132,12 @@ JSON, missing PDF; confirm messages, exit codes, identity corrections
 
 ### Implementation
 
-- [ ] T034 [US2] Change default `back_corrections` to identity (0, 0, 0) when no `--profile` and no CLI overrides in `pnp_double_with_profile_pdf.py`
-- [ ] T035 [US2] Error on missing `--profile` path (stderr + non-zero exit; no silent sample merge) in `pnp_double_with_profile_pdf.py`
-- [ ] T036 [US2] Map invalid JSON / comment-bearing profiles to actionable stderr messages + non-zero exit in `pnp_double_with_profile_pdf.py`
-- [ ] T037 [US2] Map missing/unreadable input PDFs to actionable stderr + non-zero exit (no default raw traceback UX) in `pnp_double_with_profile_pdf.py`
-- [ ] T038 [US2] Ensure CLI overrides (`--rot` / `--shiftx` / `--shifty`) win over profile axes; missing profile keys remain identity in `pnp_double_with_profile_pdf.py`
-- [ ] T039 [US2] Re-run and confirm `tests/unit/test_profile_load.py`, `tests/integration/test_cli_errors.py`, and `tests/integration/test_cli_identity.py` pass
+- [x] T034 [US2] Change default `back_corrections` to identity (0, 0, 0) when no `--profile` and no CLI overrides in `pnp_double_with_profile_pdf.py`
+- [x] T035 [US2] Error on missing `--profile` path (stderr + non-zero exit; no silent sample merge) in `pnp_double_with_profile_pdf.py`
+- [x] T036 [US2] Map invalid JSON / comment-bearing profiles to actionable stderr messages + non-zero exit in `pnp_double_with_profile_pdf.py`
+- [x] T037 [US2] Map missing/unreadable input PDFs to actionable stderr + non-zero exit (no default raw traceback UX) in `pnp_double_with_profile_pdf.py`
+- [x] T038 [US2] Ensure CLI overrides (`--rot` / `--shiftx` / `--shifty`) win over profile axes; missing profile keys remain identity in `pnp_double_with_profile_pdf.py`
+- [x] T039 [US2] Re-run and confirm `tests/unit/test_profile_load.py`, `tests/integration/test_cli_errors.py`, and `tests/integration/test_cli_identity.py` pass
 
 **Checkpoint**: US2 / SC-002 / SC-003 satisfied
 
@@ -152,9 +152,9 @@ stderr warning for warn; back indices match published rules
 
 ### Implementation
 
-- [ ] T040 [US4] Emit stderr warning when `order=fronts_then_backs`, page count odd, and `--on-odd warn` in `pnp_double_with_profile_pdf.py`
-- [ ] T041 [US4] Verify/fix page classification for `interleaved`, `fronts_then_backs`, `last_back`, `single_sided` against help/docs in `pnp_double_with_profile_pdf.py`
-- [ ] T042 [US4] Re-run and confirm `tests/unit/test_page_order.py` and `tests/integration/test_odd_warn.py` pass
+- [x] T040 [US4] Emit stderr warning when `order=fronts_then_backs`, page count odd, and `--on-odd warn` in `pnp_double_with_profile_pdf.py`
+- [x] T041 [US4] Verify/fix page classification for `interleaved`, `fronts_then_backs`, `last_back`, `single_sided` against help/docs in `pnp_double_with_profile_pdf.py`
+- [x] T042 [US4] Re-run and confirm `tests/unit/test_page_order.py` and `tests/integration/test_odd_warn.py` pass
 
 **Checkpoint**: US4 / FR-009–FR-010 green
 
@@ -170,11 +170,11 @@ fresh env install from `requirements*.txt` runs main CLI + pytest
 
 ### Implementation
 
-- [ ] T043 [US6] Unify raster same-path save to temp-file + `os.replace` (with copy fallback) matching vector `safe_save` in `pnp_double_with_profile_pdf.py`
-- [ ] T044 [P] [US6] Add integration coverage for distinct-path and same-path saves in both modes in `tests/integration/test_safe_save.py`
-- [ ] T045 [US6] Point README install instructions at `requirements.txt` / `requirements-dev.txt` in `README.md`
-- [ ] T046 [US6] Regenerate and **commit** post-fix golden PDFs via `tests/fixtures/generate_goldens.py` into `tests/fixtures/golden/`; enable `tests/integration/test_golden_outputs.py` so both sample scenarios pass identical-output asserts (pre-refactor baseline)
-- [ ] T047 [US6] Confirm install + suite smoke per `specs/001-codebase-quality/quickstart.md` (no personal/ad-hoc PDFs outside fixtures committed)
+- [x] T043 [US6] Unify raster same-path save to temp-file + `os.replace` (with copy fallback) matching vector `safe_save` in `pnp_double_with_profile_pdf.py`
+- [x] T044 [P] [US6] Add integration coverage for distinct-path and same-path saves in both modes in `tests/integration/test_safe_save.py`
+- [x] T045 [US6] Point README install instructions at `requirements.txt` / `requirements-dev.txt` in `README.md`
+- [x] T046 [US6] Regenerate and **commit** post-fix golden PDFs via `tests/fixtures/generate_goldens.py` into `tests/fixtures/golden/`; enable `tests/integration/test_golden_outputs.py` so both sample scenarios pass identical-output asserts (pre-refactor baseline)
+- [x] T047 [US6] Confirm install + suite smoke per `specs/001-codebase-quality/quickstart.md` (no personal/ad-hoc PDFs outside fixtures committed)
 
 **Checkpoint**: Plan Phase 2 exit gate — P1 suite green including safe-save **and** golden identity tests; ready for refactor
 
@@ -193,14 +193,14 @@ unavailable error; tools docs match reality
 
 ### Implementation
 
-- [ ] T048 [US5] Extract units, page-order, and sign/matrix helpers into `geometry.py`; update imports in `pnp_double_with_profile_pdf.py`
-- [ ] T049 [US5] Extract load/validate/merge profile logic into `profiles.py`; update imports in `pnp_double_with_profile_pdf.py`
-- [ ] T050 [P] [US5] Optionally extract shared safe-save / thin writer helpers into `io_pdf.py` if it reduces duplication without API churn
-- [ ] T051 [US5] Disable `tools/pnp_batch_align.py` `--auto-detect-smart` with clear unavailable/experimental stderr + non-zero exit; propagate worker non-zero exits
-- [ ] T052 [US5] Update unit/integration imports to use `geometry.py` / `profiles.py` where tests target pure logic (`tests/unit/`)
-- [ ] T053 [P] [US5] Label `tools/pnp_double_with_profile_img.py` experimental and document deferred OpenCV/FPDF extras (or “out of slice”) in `tools/README.md` and script docstring
-- [ ] T054 [P] [US5] Align `tools/README.md` listed scripts with files that actually exist under `tools/`
-- [ ] T055 [US5] Re-run full `tests/` suite including `tests/integration/test_golden_outputs.py`; confirm refactored outputs are **identical** to `tests/fixtures/golden/*.pdf` (no geometric drift)
+- [x] T048 [US5] Extract units, page-order, and sign/matrix helpers into `geometry.py`; update imports in `pnp_double_with_profile_pdf.py`
+- [x] T049 [US5] Extract load/validate/merge profile logic into `profiles.py`; update imports in `pnp_double_with_profile_pdf.py`
+- [x] T050 [P] [US5] Optionally extract shared safe-save / thin writer helpers into `io_pdf.py` if it reduces duplication without API churn
+- [x] T051 [US5] Disable `tools/pnp_batch_align.py` `--auto-detect-smart` with clear unavailable/experimental stderr + non-zero exit; propagate worker non-zero exits
+- [x] T052 [US5] Update unit/integration imports to use `geometry.py` / `profiles.py` where tests target pure logic (`tests/unit/`)
+- [x] T053 [P] [US5] Label `tools/pnp_double_with_profile_img.py` experimental and document deferred OpenCV/FPDF extras (or “out of slice”) in `tools/README.md` and script docstring
+- [x] T054 [P] [US5] Align `tools/README.md` listed scripts with files that actually exist under `tools/`
+- [x] T055 [US5] Re-run full `tests/` suite including `tests/integration/test_golden_outputs.py`; confirm refactored outputs are **identical** to `tests/fixtures/golden/*.pdf` (no geometric drift)
 
 **Checkpoint**: FR-012 / FR-013 / FR-019; Separation of Concerns improved; suite green; golden identity holds
 
@@ -210,12 +210,12 @@ unavailable error; tools docs match reality
 
 **Purpose**: Typing, docs coherence, hygiene, final validation
 
-- [ ] T056 [P] Add Python 3.9+ type annotations on new/substantially edited code in `geometry.py`, `profiles.py`, and edited sections of `pnp_double_with_profile_pdf.py`
-- [ ] T057 [P] Update `README.md` Features so vector-first, back-only correction, and profile reuse claims match runtime + suite
-- [ ] T058 [P] Align `docs/calibration_guide.md` sign conventions and odd/profile notes with implemented behavior (call out intentional contract fixes)
-- [ ] T059 Remove duplicated dead `load_profile` / unused paths after extraction in `pnp_double_with_profile_pdf.py` and in-scope tools
-- [ ] T060 Run full quickstart validation from `specs/001-codebase-quality/quickstart.md` (pytest + smoke CLI + failure UX + odd warn + batch smart-detect + golden identity)
-- [ ] T061 Final hygiene check: `git status` shows no personal profiles, secrets, or ad-hoc generated alignment PDFs staged outside `tests/fixtures/` (FR-020 / SC-007)
+- [x] T056 [P] Add Python 3.9+ type annotations on new/substantially edited code in `geometry.py`, `profiles.py`, and edited sections of `pnp_double_with_profile_pdf.py`
+- [x] T057 [P] Update `README.md` Features so vector-first, back-only correction, and profile reuse claims match runtime + suite
+- [x] T058 [P] Align `docs/calibration_guide.md` sign conventions and odd/profile notes with implemented behavior (call out intentional contract fixes)
+- [x] T059 Remove duplicated dead `load_profile` / unused paths after extraction in `pnp_double_with_profile_pdf.py` and in-scope tools
+- [x] T060 Run full quickstart validation from `specs/001-codebase-quality/quickstart.md` (pytest + smoke CLI + failure UX + odd warn + batch smart-detect + golden identity)
+- [x] T061 Final hygiene check: `git status` shows no personal profiles, secrets, or ad-hoc generated alignment PDFs staged outside `tests/fixtures/` (FR-020 / SC-007)
 
 ---
 

@@ -9,7 +9,7 @@ This script uses pnp_double_with_profile_pdf.py as a worker
 (by default, located in the same directory).
 """
 
-import os, argparse, glob, subprocess, re, math
+import os, argparse, glob, subprocess, re, math, sys
 import fitz  # PyMuPDF
 from PIL import Image
 
@@ -185,7 +185,7 @@ def build_worker_command(pdf, output, order, args):
 
 def main():
     ap = argparse.ArgumentParser(
-        description="Batch PnP aligner with smart automatic page-order detection."
+        description="Batch PnP aligner (experimental). Smart page-order detection is disabled."
     )
     ap.add_argument("--input-dir", required=True, help="Directory containing input PDFs.")
     ap.add_argument("--output-dir", required=True, help="Destination directory.")
@@ -193,19 +193,19 @@ def main():
     ap.add_argument(
         "--auto-detect-smart",
         action="store_true",
-        help="Automatically detect page order by analyzing each PDF."
+        help="Unavailable: smart page-order detection is experimental/disabled.",
     )
     ap.add_argument(
         "--even-default",
         default="interleaved",
         choices=["interleaved", "fronts_then_backs"],
-        help="Default order if the PDF is even and no clear pattern is found."
+        help="Default order if the PDF is even and no clear pattern is found.",
     )
     ap.add_argument(
         "--on-odd",
         default="warn",
         choices=["warn", "add_blank", "drop_last"],
-        help="Action to take if the PDF is odd in fronts_then_backs mode."
+        help="Action to take if the PDF is odd in fronts_then_backs mode.",
     )
     ap.add_argument("--flip-mode", choices=["long", "short"], help="Override profile flip mode.")
     ap.add_argument("--rot", type=float, help="Override extra_rot_deg (degrees).")
@@ -220,12 +220,22 @@ def main():
     ap.add_argument("--verbose", action="store_true", help="Show visual similarity metrics.")
     args = ap.parse_args()
 
+    if args.auto_detect_smart:
+        print(
+            "Error: --auto-detect-smart is unavailable "
+            "(experimental / incomplete; disabled to avoid silent failures). "
+            "Omit the flag and set page order via worker defaults or filename hints.",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+
     os.makedirs(args.output_dir, exist_ok=True)
     pdfs = sorted(glob.glob(os.path.join(args.input_dir, "*.pdf")))
     if not pdfs:
         print("No PDFs found in the input directory.")
         return
 
+    failures = 0
     for pdf in pdfs:
         name = os.path.basename(pdf)
 
@@ -237,9 +247,14 @@ def main():
         print(f"Processing: {name} -> {out_name}")
 
         cmd = build_worker_command(pdf, output, order, args)
-        subprocess.run(cmd, check=False)
+        result = subprocess.run(cmd, check=False)
+        if result.returncode != 0:
+            failures += 1
+            print(f"Worker failed for {name} (exit {result.returncode})", file=sys.stderr)
 
     print("\nBatch processing completed. Review:", args.output_dir)
+    if failures:
+        raise SystemExit(1)
 
 if __name__ == "__main__":
     main()

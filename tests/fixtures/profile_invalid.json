@@ -1,0 +1,7 @@
+{
+  "paper": {"width_mm": 210.0},
+  "back_corrections": {
+    "extra_rot_deg": "not-a-number",
+    "shift_x_mm": 1.0
+  }
+}

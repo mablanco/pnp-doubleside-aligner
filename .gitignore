@@ -42,6 +42,9 @@ profiles/*
 # Generated / local working files
 *.pdf
 !docs/**/*.pdf
+# Allow committed test fixtures and golden baselines (FR-020)
+!tests/fixtures/**/*.pdf
+!tests/fixtures/golden/**/*.pdf
 *_aligned.pdf
 calibration_*.pdf
 out/

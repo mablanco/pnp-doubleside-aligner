@@ -3,14 +3,17 @@
 """
 pnp_double_with_profile_img.py
 
-Script to crop, align and assemble Print-and-Play card sheet images
-(fronts and backs) using a printer calibration profile.
+EXPERIMENTAL / OUT OF FIRST REMEDIATION SLICE.
+
+Image-based Print-and-Play path (PNG/JPG) with OpenCV + FPDF. Not covered by
+the main characterization suite; prefer pnp_double_with_profile_pdf.py for
+production duplex alignment. OpenCV/FPDF dependency rewrite is deferred.
 
 The script:
-- computes a relative crop based on a reference image and a reference crop,
-- applies the same crop to all pages,
-- applies printer back-side corrections (rotation, shifts, flip mode),
-- generates an A4 PDF according to the profile.
+    - computes a relative crop based on a reference image and a reference crop,
+    - applies the same crop to all pages,
+    - applies printer back-side corrections (rotation, shifts, flip mode),
+    - generates an A4 PDF according to the profile.
 """
 
 import os

@@ -1,0 +1,11 @@
+{
+  "paper": {"width_mm": 210.0, "height_mm": 297.0, "orientation": "portrait"},
+  "margins": {"x_mm": 0.0, "y_mm": 0.0},
+  "flip_mode": "long",
+  "back_corrections": {
+    "extra_rot_deg": 0.0,
+    "shift_x_mm": 5.0,
+    "shift_y_mm": 0.0
+  },
+  "_notes": ["Shift-only profile: backs must differ from identity when vector path works."]
+}
