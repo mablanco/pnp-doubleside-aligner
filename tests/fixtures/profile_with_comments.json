@@ -1,0 +1,9 @@
+{
+  // Comment-bearing profile — not valid runtime JSON
+  "flip_mode": "long",
+  "back_corrections": {
+    "extra_rot_deg": 1.0, /* inline */
+    "shift_x_mm": 0.0,
+    "shift_y_mm": 0.0
+  }
+}

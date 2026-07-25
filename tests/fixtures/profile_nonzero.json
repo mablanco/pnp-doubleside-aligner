@@ -1,0 +1,11 @@
+{
+  "paper": {"width_mm": 210.0, "height_mm": 297.0, "orientation": "portrait"},
+  "margins": {"x_mm": 0.0, "y_mm": 0.0},
+  "flip_mode": "long",
+  "back_corrections": {
+    "extra_rot_deg": 2.0,
+    "shift_x_mm": 3.0,
+    "shift_y_mm": 4.0
+  },
+  "_notes": ["Non-zero fixture for characterization; flip_mode long avoids extra 180."]
+}
