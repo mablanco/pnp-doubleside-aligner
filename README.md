@@ -40,10 +40,10 @@ template customizations live under `.specify/templates/overrides/`.
 
 ## Features
 
-- Corrects rotation (skew) and X/Y shift on back pages only
-- Uses printer calibration profiles (JSON)
-- Supports multiple PnP page orders
-- Vector-first processing with automatic raster fallback
+- Corrects rotation (skew) and X/Y shift on **back pages only** (fronts unchanged)
+- Uses reusable printer calibration profiles (JSON); identity defaults without a profile
+- Supports multiple PnP page orders (`interleaved`, `fronts_then_backs`, `last_back`, `single_sided`)
+- **Vector-first** processing with automatic raster fallback on recoverable failure
 - Controlled raster output with JPEG compression
 - Designed for real-world duplex printers
 
@@ -59,7 +59,9 @@ with system-wide Python packages.
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install pymupdf pillow reportlab
+python -m pip install -r requirements.txt
+# optional: characterization / unit suite
+python -m pip install -r requirements-dev.txt
 ```
 
 To deactivate the environment:

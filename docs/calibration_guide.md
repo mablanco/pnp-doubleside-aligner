@@ -85,8 +85,16 @@ Positive values mean:
 
 Negative values move in the opposite direction.
 
+These sign conventions apply to **both** the preferred (vector) path and the
+raster fallback. Without `--profile` and without CLI overrides, corrections are
+identity (`0°, 0 mm, 0 mm`) — not sample skew.
+
 Important: remove all comments before using the profile.
-The final file must be valid JSON.
+The final file must be valid JSON. Templates under `profiles/` that contain
+comments must be copied and stripped before use with `--profile`.
+
+For `fronts_then_backs` with an odd page count, `--on-odd warn` prints a warning
+on stderr and continues; use `add_blank` or `drop_last` to change effective length.
 
 ## Step 5: Iterate if needed
 
