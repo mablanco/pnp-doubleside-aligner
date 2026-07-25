@@ -1,0 +1,3 @@
+# Dev-only dependencies (characterization / unit / integration suite).
+-r requirements.txt
+pytest==7.4.4
