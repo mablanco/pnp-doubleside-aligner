@@ -1,5 +1,7 @@
 # PnP Double-Side Aligner
 
+[![CI](https://github.com/mablanco/pnp-doubleside-aligner/actions/workflows/ci.yml/badge.svg)](https://github.com/mablanco/pnp-doubleside-aligner/actions/workflows/ci.yml)
+
 A practical tool to correct duplex misalignment when printing Print-and-Play (PnP) PDFs.
 
 This project compensates for mechanical skew and offset introduced by real printers
@@ -69,6 +71,15 @@ To deactivate the environment:
 ```bash
 deactivate
 ```
+
+### Tests and CI
+
+```bash
+PYTHONPATH=. python -m pytest tests/ -v
+```
+
+Pull requests to `main` run the same suite on GitHub Actions (Python 3.9 and 3.12).
+`main` requires a green `ci-success` check before merge.
 
 ### System packages (preferred when available)
 
