@@ -8,6 +8,22 @@ when printing double-sided, producing accurately aligned fronts and backs.
 The workflow is based on printer calibration: you measure once, create a profile,
 and reuse it for all compatible PnPs.
 
+## Project status
+
+This started as a hand-written utility. Spec Kit / Cursor AI workflows are being
+added on top of that existing codebase to help with specs, refactors, and
+documentation—not to replace the original duplex-alignment behavior.
+
+If you contribute (human or AI-assisted):
+
+- Keep geometric transforms and printer-profile contracts stable unless a change
+  is intentional and documented
+- Do not commit secrets, tokens, `.env` files, personal printer profiles, or
+  local tool config (see `.gitignore`)
+- Prefer characterization tests before refactoring transform or profile logic
+
+Project principles live in `.specify/memory/constitution.md`.
+
 ## Features
 
 - Corrects rotation (skew) and X/Y shift on back pages only
@@ -76,6 +92,9 @@ Use this file as a starting point to calibrate a new printer or paper type.
 2. Edit the values after calibration
 3. Remove all comments so the file becomes valid JSON
 4. Use the profile with the main script
+
+Personal profiles under `profiles/` (anything other than the tracked examples)
+are gitignored on purpose so local calibration data is not published.
 
 ## Calibration
 
@@ -167,6 +186,7 @@ Poorly centered PDFs must be fixed before using this tool.
 - Always use different input and output filenames
 - Close PDF viewers before processing files
 - Recalibrate if you change printer, paper, or duplex settings
+- Keep API keys, Sonar tokens, and `.env` files out of git
 
 ## Contributing
 

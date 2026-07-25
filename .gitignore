@@ -1,2 +1,69 @@
+# Secrets and local environment
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+**/secrets/
+.secrets/
+
+# Local analysis / CI tokens (never commit)
 sonar-project.properties
+sonar-project.properties.local
+.scannerwork/
+
+# Python
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.cache/
+
+# Personal printer profiles (keep only tracked examples)
+profiles/*
+!profiles/base_printer_profile.json
+!profiles/example_printer.json
+
+# Generated / local working files
+*.pdf
+!docs/**/*.pdf
+*_aligned.pdf
+calibration_*.pdf
+out/
+output/
+tmp/
+temp/
+.tmp/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# AI / agent local scratch (do not leak prompts with secrets)
+gemini-code-*.md
+*.local.md
+.agent/
+.agents/scratch/
+_bmad-output/
+.specify/tmp/
