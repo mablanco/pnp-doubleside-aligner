@@ -36,6 +36,21 @@ def sample_odd(fixtures_dir: Path) -> Path:
 
 
 @pytest.fixture
+def sample_fronts_then_backs(fixtures_dir: Path) -> Path:
+    return fixtures_dir / "sample_fronts_then_backs.pdf"
+
+
+@pytest.fixture
+def sample_single(fixtures_dir: Path) -> Path:
+    return fixtures_dir / "sample_single.pdf"
+
+
+@pytest.fixture
+def sample_ambiguous_even(fixtures_dir: Path) -> Path:
+    return fixtures_dir / "sample_ambiguous_even.pdf"
+
+
+@pytest.fixture
 def profile_nonzero(fixtures_dir: Path) -> Path:
     return fixtures_dir / "profile_nonzero.json"
 

@@ -34,8 +34,10 @@ unsupported/experimental. Prefer the main PDF workflow
 Experimental batch-processing tool for multiple PnP PDFs.
 
 - Processes all PDFs in a directory with the main aligner as worker
-- `--auto-detect-smart` is **disabled / unavailable** (incomplete heuristics);
-  the flag exits with a clear error instead of crashing
+- `--auto-detect-smart` is **available** (still experimental): per-file page
+  order via **name hint → page count → content (common-back clusters) →
+  `--even-default`**. Large PDFs (>40 pages) fingerprint an evenly spaced
+  sample of up to 40 pages. Status lines report `order='…'` and a short reason
 - Manual review of outputs is strongly recommended
 
 ## Notes
