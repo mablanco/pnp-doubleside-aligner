@@ -1,0 +1,5 @@
+# Main workflow stack (pnp_double_with_profile_pdf.py and shared PDF tools).
+# Pinned to versions verified against the calibration/transform audit (PyMuPDF 1.23.x).
+PyMuPDF==1.23.7
+Pillow==10.2.0
+reportlab==4.1.0

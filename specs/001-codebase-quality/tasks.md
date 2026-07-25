@@ -35,7 +35,7 @@ the prior exit gate is met.
 **Purpose**: Test harness and dependency pins so characterization can run
 
 - [x] T001 Create `tests/`, `tests/unit/`, `tests/integration/`, `tests/fixtures/`, and `tests/fixtures/golden/` directories with empty `__init__.py` where needed for imports
-- [ ] T002 [P] Add pinned main-stack `requirements.txt` (PyMuPDF, Pillow, ReportLab) at repository root
+- [x] T002 [P] Add pinned main-stack `requirements.txt` (PyMuPDF, Pillow, ReportLab) at repository root
 - [ ] T003 [P] Add `requirements-dev.txt` with `pytest` at repository root
 - [ ] T004 [P] Ensure `.gitignore` keeps personal profiles, secrets, venvs, and *ad-hoc* generated alignment PDFs untracked, while allowing committed fixtures under `tests/fixtures/` and `tests/fixtures/golden/` (FR-020)
 
