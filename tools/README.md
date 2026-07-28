@@ -24,10 +24,32 @@ Features:
 
 ### pnp_double_with_profile_img.py (**experimental**)
 
-Experimental image-based PnP path (PNG/JPG). OpenCV/FPDF extras and a full
-rewrite are **out of the first remediation slice** — treat this script as
-unsupported/experimental. Prefer the main PDF workflow
-(`pnp_double_with_profile_pdf.py`).
+Experimental image-based PnP path (PNG/JPG) with OpenCV crop matching and FPDF
+output. **Prefer the main PDF workflow** (`pnp_double_with_profile_pdf.py`) for
+production duplex alignment.
+
+Optional dependencies (not part of the main or dev install):
+
+```bash
+pip install -r requirements.txt
+pip install -r requirements-img.txt
+```
+
+Example:
+
+```bash
+python tools/pnp_double_with_profile_img.py \
+  --profile profiles/example_printer.json \
+  --ref-original tests/fixtures/img/ref_original.png \
+  --ref-crop tests/fixtures/img/ref_crop.png \
+  --front tests/fixtures/img/front0.png \
+  --back tests/fixtures/img/back0.png \
+  --output /tmp/pnp_img_out.pdf
+```
+
+If a `--back` is omitted for an index, the cropped front is duplicated as the
+back. Profile rotation/shift/flip apply to **backs only**. See
+`specs/003-image-tool-stack/contracts/image-tool-cli.md`.
 
 ### pnp_batch_align.py (**experimental**)
 

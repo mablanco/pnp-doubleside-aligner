@@ -45,6 +45,9 @@ profiles/*
 # Allow committed test fixtures and golden baselines (FR-020)
 !tests/fixtures/**/*.pdf
 !tests/fixtures/golden/**/*.pdf
+!tests/fixtures/**/*.png
+!tests/fixtures/**/*.jpg
+!tests/fixtures/**/*.jpeg
 *_aligned.pdf
 calibration_*.pdf
 out/

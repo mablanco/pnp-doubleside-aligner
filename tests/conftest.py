@@ -12,7 +12,17 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAIN_SCRIPT = REPO_ROOT / "pnp_double_with_profile_pdf.py"
 BATCH_SCRIPT = REPO_ROOT / "tools" / "pnp_batch_align.py"
+IMG_SCRIPT = REPO_ROOT / "tools" / "pnp_double_with_profile_img.py"
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Register optional markers (img extras are not required for default CI)."""
+    config.addinivalue_line(
+        "markers",
+        "img: needs optional image-tool extras (opencv/fpdf); "
+        "skip when cv2 is not importable",
+    )
 
 
 @pytest.fixture
@@ -85,6 +95,21 @@ def run_batch_cli(
     )
 
 
+def run_img_tool(
+    args: Sequence[str],
+    *,
+    cwd: Optional[Path] = None,
+) -> subprocess.CompletedProcess:
+    """Run the experimental image tool CLI via subprocess."""
+    cmd: List[str] = [sys.executable, str(IMG_SCRIPT), *args]
+    return subprocess.run(
+        cmd,
+        cwd=str(cwd or REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+
+
 @pytest.fixture
 def run_main_cli():
     return run_cli
@@ -95,7 +120,17 @@ def run_batch():
     return run_batch_cli
 
 
+@pytest.fixture
+def run_img_cli():
+    return run_img_tool
+
+
+@pytest.fixture
+def img_fixtures_dir(fixtures_dir: Path) -> Path:
+    return fixtures_dir / "img"
+
+
 # Wire PDF compare helper for golden tests (T024)
 from tests.helpers.pdf_compare import pdfs_equivalent  # noqa: E402
 
-__all__ = ["pdfs_equivalent", "run_cli", "run_batch_cli"]
+__all__ = ["pdfs_equivalent", "run_cli", "run_batch_cli", "run_img_tool"]

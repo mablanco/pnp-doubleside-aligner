@@ -1,0 +1,9 @@
+# Optional extras for the experimental image PnP tool
+# (tools/pnp_double_with_profile_img.py).
+# Install AFTER the main stack:
+#   pip install -r requirements.txt
+#   pip install -r requirements-img.txt
+# Do NOT -r this file from requirements.txt or requirements-dev.txt.
+opencv-python-headless==4.10.0.84
+numpy==1.26.4
+fpdf2==2.7.8
