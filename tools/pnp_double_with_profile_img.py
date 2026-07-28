@@ -10,8 +10,8 @@ This tool is optional and not covered by the main characterization suite.
 
 Optional dependencies (install after the main stack)::
 
-    pip install -r requirements.txt
-    pip install -r requirements-img.txt
+    pip install -e ".[img]"
+    # or: pip install -r requirements-img.txt
 
 The script:
     - computes a relative crop from ``--ref-original`` / ``--ref-crop``,
@@ -33,7 +33,8 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 IMG_DEPS_HINT = (
     "Missing optional image-tool dependencies. "
-    "Install them with: pip install -r requirements-img.txt"
+    'Install them with: pip install -e ".[img]" '
+    "(or: pip install -r requirements-img.txt)"
 )
 
 
@@ -231,14 +232,15 @@ def build_parser() -> argparse.ArgumentParser:
             "EXPERIMENTAL: build a duplex PDF from PNG/JPG pages using a "
             "printer profile and OpenCV crop matching. Prefer "
             "pnp_double_with_profile_pdf.py for production. Requires optional "
-            "deps from requirements-img.txt."
+            'img extras (pip install -e ".[img]" or requirements-img.txt).'
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Pairing: for each --front index, emit front then back. "
             "If a matching --back is omitted, the cropped front is duplicated "
             "as the back (documented experimental behavior).\n\n"
-            "Install extras: pip install -r requirements-img.txt"
+            'Install extras: pip install -e ".[img]" '
+            "(or: pip install -r requirements-img.txt)"
         ),
     )
     parser.add_argument(

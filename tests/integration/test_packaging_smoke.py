@@ -54,7 +54,7 @@ def test_default_dependencies_exclude_image_extras() -> None:
     main_part = text.split("[project.optional-dependencies]", 1)[0]
     assert "opencv" not in main_part
     assert "fpdf" not in main_part
-    # Optional img extra may be absent until feature 003; if present it is ok.
+    # Optional img extra may list opencv/fpdf; that is ok under optional-deps.
     if "[project.optional-dependencies]" in text:
         # Ensure opencv is not in the unscoped dependencies list lines.
         for line in main_part.splitlines():
