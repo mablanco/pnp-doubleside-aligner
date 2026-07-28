@@ -34,9 +34,9 @@ US2 CLI rewrite → US3 boundaries → polish. Do not put OpenCV/FPDF into
 
 **Purpose**: Optional dependency file and directory placeholders
 
-- [ ] T001 Create pinned optional extras file `requirements-img.txt` at repo root (`opencv-python-headless`, `numpy`, `fpdf2` with versions per `specs/003-image-tool-stack/research.md` R2; do not `-r` into main requirements)
-- [ ] T002 [P] Create `tests/fixtures/img/` directory and document intended assets in `tests/fixtures/img/README.md`
-- [ ] T003 [P] Confirm `requirements.txt` and `requirements-dev.txt` contain no OpenCV/FPDF/numpy-as-required image extras (grep/review)
+- [X] T001 Create pinned optional extras file `requirements-img.txt` at repo root (`opencv-python-headless`, `numpy`, `fpdf2` with versions per `specs/003-image-tool-stack/research.md` R2; do not `-r` into main requirements)
+- [X] T002 [P] Create `tests/fixtures/img/` directory and document intended assets in `tests/fixtures/img/README.md`
+- [X] T003 [P] Confirm `requirements.txt` and `requirements-dev.txt` contain no OpenCV/FPDF/numpy-as-required image extras (grep/review)
 
 **Checkpoint**: `requirements-img.txt` exists; main install path still PDF-only
 
@@ -48,9 +48,9 @@ US2 CLI rewrite → US3 boundaries → polish. Do not put OpenCV/FPDF into
 
 **⚠️ CRITICAL**: CLI rewrite and happy-path smoke need fixtures; missing-deps test can start once T001 exists
 
-- [ ] T004 [P] Create minimal deterministic PNGs: `tests/fixtures/img/ref_original.png`, `tests/fixtures/img/ref_crop.png`, `tests/fixtures/img/front0.png`, `tests/fixtures/img/back0.png` (crop patch must be matchable inside original)
-- [ ] T005 Register optional `img` pytest marker in `tests/conftest.py` (or `pytest.ini` / `pyproject.toml` markers section if present) and document skip-when-no-cv2 policy
-- [ ] T006 [P] Add `run_img_tool` helper (subprocess to `tools/pnp_double_with_profile_img.py`) in `tests/conftest.py`
+- [X] T004 [P] Create minimal deterministic PNGs: `tests/fixtures/img/ref_original.png`, `tests/fixtures/img/ref_crop.png`, `tests/fixtures/img/front0.png`, `tests/fixtures/img/back0.png` (crop patch must be matchable inside original)
+- [X] T005 Register optional `img` pytest marker in `tests/conftest.py` (or `pytest.ini` / `pyproject.toml` markers section if present) and document skip-when-no-cv2 policy
+- [X] T006 [P] Add `run_img_tool` helper (subprocess to `tools/pnp_double_with_profile_img.py`) in `tests/conftest.py`
 
 **Checkpoint**: Fixtures readable; marker documented; main pytest still green without img extras
 
@@ -65,13 +65,13 @@ US2 CLI rewrite → US3 boundaries → polish. Do not put OpenCV/FPDF into
 
 ### Tests for User Story 1
 
-- [ ] T007 [P] [US1] Add static/docs-oriented check or test comment in `tests/integration/test_img_tool_missing_deps.py` module docstring mapping to FR-001/002 (optional assert that parsing `requirements.txt` excludes opencv/fpdf)
+- [X] T007 [P] [US1] Add static/docs-oriented check or test comment in `tests/integration/test_img_tool_missing_deps.py` module docstring mapping to FR-001/002 (optional assert that parsing `requirements.txt` excludes opencv/fpdf)
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Document optional install (`pip install -r requirements-img.txt`) and “prefer main PDF” in `tools/README.md` under `pnp_double_with_profile_img.py`
-- [ ] T009 [P] [US1] Add short pointer in root `README.md` optional-tools section to `requirements-img.txt` without making it mandatory
-- [ ] T010 [US1] Update module docstring in `tools/pnp_double_with_profile_img.py` to reference `requirements-img.txt` and experimental status (replace “out of first remediation slice only” with current packaging guidance)
+- [X] T008 [US1] Document optional install (`pip install -r requirements-img.txt`) and “prefer main PDF” in `tools/README.md` under `pnp_double_with_profile_img.py`
+- [X] T009 [P] [US1] Add short pointer in root `README.md` optional-tools section to `requirements-img.txt` without making it mandatory
+- [X] T010 [US1] Update module docstring in `tools/pnp_double_with_profile_img.py` to reference `requirements-img.txt` and experimental status (replace “out of first remediation slice only” with current packaging guidance)
 
 **Checkpoint**: SC-001/SC-005 packaging/docs boundary clear for deps
 
@@ -87,16 +87,16 @@ produces output PDF; fronts without back corrections; main pytest unchanged
 
 ### Tests for User Story 2
 
-- [ ] T011 [P] [US2] Add `@pytest.mark.img` smoke test in `tests/integration/test_img_tool_smoke.py`: run CLI with fixtures → output PDF exists; skip if OpenCV/FPDF missing
-- [ ] T012 [P] [US2] Add test that front pages do not receive back rot/shift (inspect or behavioral assertion) in `tests/integration/test_img_tool_smoke.py` or unit helper tests
+- [X] T011 [P] [US2] Add `@pytest.mark.img` smoke test in `tests/integration/test_img_tool_smoke.py`: run CLI with fixtures → output PDF exists; skip if OpenCV/FPDF missing
+- [X] T012 [P] [US2] Add test that front pages do not receive back rot/shift (inspect or behavioral assertion) in `tests/integration/test_img_tool_smoke.py` or unit helper tests
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Replace hardcoded `PROFILE_PATH` / `REF_*` / `FRONTS` / `BACKS` / fixed output with argparse CLI per `specs/003-image-tool-stack/contracts/image-tool-cli.md` in `tools/pnp_double_with_profile_img.py`
-- [ ] T014 [US2] Use profile paper width/height for FPDF page format (fix silent always-A4 mismatch) in `tools/pnp_double_with_profile_img.py`
-- [ ] T015 [US2] Keep OpenCV crop template-matching + FPDF emit; apply profile rot/shift/flip only to backs; document missing-back → duplicate front in help text in `tools/pnp_double_with_profile_img.py`
-- [ ] T016 [US2] Align profile JSON error messaging with project norms (invalid/comment-bearing → actionable stderr + ≠0) in `tools/pnp_double_with_profile_img.py`
-- [ ] T017 [US2] Confirm marked img smoke passes when extras installed; ensure `pnp_double_with_profile_pdf.py` untouched
+- [X] T013 [US2] Replace hardcoded `PROFILE_PATH` / `REF_*` / `FRONTS` / `BACKS` / fixed output with argparse CLI per `specs/003-image-tool-stack/contracts/image-tool-cli.md` in `tools/pnp_double_with_profile_img.py`
+- [X] T014 [US2] Use profile paper width/height for FPDF page format (fix silent always-A4 mismatch) in `tools/pnp_double_with_profile_img.py`
+- [X] T015 [US2] Keep OpenCV crop template-matching + FPDF emit; apply profile rot/shift/flip only to backs; document missing-back → duplicate front in help text in `tools/pnp_double_with_profile_img.py`
+- [X] T016 [US2] Align profile JSON error messaging with project norms (invalid/comment-bearing → actionable stderr + ≠0) in `tools/pnp_double_with_profile_img.py`
+- [X] T017 [US2] Confirm marked img smoke passes when extras installed; ensure `pnp_double_with_profile_pdf.py` untouched
 
 **Checkpoint**: FR-004/FR-007/FR-008 satisfied for happy path
 
@@ -112,14 +112,14 @@ clear error; docs still say experimental
 
 ### Tests for User Story 3
 
-- [ ] T018 [US3] Integration/unit test: missing extras → stderr mentions `requirements-img.txt` (or install hint) + ≠0 in `tests/integration/test_img_tool_missing_deps.py` (test import guard directly if cv2 present in env)
-- [ ] T019 [P] [US3] Integration test: missing input path / bad profile → actionable stderr + ≠0 (with extras installed or mocked) in `tests/integration/test_img_tool_errors.py`
+- [X] T018 [US3] Integration/unit test: missing extras → stderr mentions `requirements-img.txt` (or install hint) + ≠0 in `tests/integration/test_img_tool_missing_deps.py` (test import guard directly if cv2 present in env)
+- [X] T019 [P] [US3] Integration test: missing input path / bad profile → actionable stderr + ≠0 (with extras installed or mocked) in `tests/integration/test_img_tool_errors.py`
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Add guarded/lazy imports for cv2/numpy/fpdf with stderr install hint in `tools/pnp_double_with_profile_img.py` (prefer `--help` without heavy imports when practical)
-- [ ] T021 [US3] Ensure expected-failure paths avoid raw traceback as primary UX in `tools/pnp_double_with_profile_img.py`
-- [ ] T022 [US3] Finalize experimental banners in `tools/pnp_double_with_profile_img.py`, `tools/README.md`, and README pointer (FR-010)
+- [X] T020 [US3] Add guarded/lazy imports for cv2/numpy/fpdf with stderr install hint in `tools/pnp_double_with_profile_img.py` (prefer `--help` without heavy imports when practical)
+- [X] T021 [US3] Ensure expected-failure paths avoid raw traceback as primary UX in `tools/pnp_double_with_profile_img.py`
+- [X] T022 [US3] Finalize experimental banners in `tools/pnp_double_with_profile_img.py`, `tools/README.md`, and README pointer (FR-010)
 
 **Checkpoint**: SC-004 missing-deps UX; FR-005/FR-006 done
 
@@ -127,9 +127,9 @@ clear error; docs still say experimental
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T023 Run main suite without img extras: `python -m pytest tests/ -v -m "not img"` (or equivalent ignore) and confirm green (FR-009 / SC-003)
-- [ ] T024 Run steps from `specs/003-image-tool-stack/quickstart.md` and fix gaps
-- [ ] T025 [P] Complexity Tracking already in plan — no new main-stack deps; double-check `requirements-img.txt` pins are reproducible
+- [X] T023 Run main suite without img extras: `python -m pytest tests/ -v -m "not img"` (or equivalent ignore) and confirm green (FR-009 / SC-003)
+- [X] T024 Run steps from `specs/003-image-tool-stack/quickstart.md` and fix gaps
+- [X] T025 [P] Complexity Tracking already in plan — no new main-stack deps; double-check `requirements-img.txt` pins are reproducible
 
 ---
 

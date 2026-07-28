@@ -78,9 +78,16 @@ pnp-double-align --help
 python -m pnp_double_with_profile_pdf --help
 ```
 
-Image-tool extras are **not** part of the default install. When
-`requirements-img.txt` is added (feature `003`), use that file or a future
-`pip install -e ".[img]"` extra; until then, keep the main PDF workflow.
+Image-tool extras are **not** part of the default install. For the
+**experimental** image PnP helper (`tools/pnp_double_with_profile_img.py`),
+install optional pins after the main stack:
+
+```bash
+pip install -r requirements-img.txt
+```
+
+Prefer the main PDF workflow for production duplex alignment. See
+`tools/README.md`.
 
 ### Requirements / loose-script workflow (still supported)
 
@@ -90,6 +97,8 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 # optional: characterization / unit suite
 python -m pip install -r requirements-dev.txt
+# optional: experimental image tool only
+# python -m pip install -r requirements-img.txt
 ```
 
 Pins in `requirements*.txt` mirror `pyproject.toml` — keep versions aligned.
@@ -229,7 +238,10 @@ Additional helper scripts are available in the tools/ directory.
 These scripts are optional and intended for advanced or specialized workflows,
 such as assisted calibration, image-based PnPs, or batch processing.
 
-See tools/README.md for details.
+The **experimental** image tool (`tools/pnp_double_with_profile_img.py`) needs
+optional extras from `requirements-img.txt` (not required for the main PDF
+path). Prefer the main PDF aligner for production duplex work. See
+`tools/README.md` for details.
 
 ## FAQ
 

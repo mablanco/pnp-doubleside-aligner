@@ -28,6 +28,12 @@ fixture change is required (will invalidate goldens).
 | `profile_invalid.json` | Valid JSON syntax but bad types / unusable corrections |
 | `profile_with_comments.json` | Comment-bearing (must fail at runtime) |
 
+## Image-tool fixtures (`img/`)
+
+Small PNGs for the optional experimental image tool smoke tests. See
+`img/README.md`. Default CI does **not** require OpenCV; use
+`pytest -m img` when `requirements-img.txt` is installed.
+
 ## Golden outputs
 
 Baselines live under `golden/`. Capture **desired-contract** outputs only
