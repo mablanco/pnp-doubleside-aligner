@@ -36,8 +36,10 @@ production duplex alignment.
 Optional dependencies (not part of the main or dev install):
 
 ```bash
-pip install -r requirements.txt
-pip install -r requirements-img.txt
+pip install -e ".[img]"
+# or, after main stack:
+# pip install -r requirements.txt
+# pip install -r requirements-img.txt
 ```
 
 Example:

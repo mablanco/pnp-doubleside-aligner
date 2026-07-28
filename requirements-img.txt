@@ -1,7 +1,9 @@
 # Optional extras for the experimental image PnP tool
 # (tools/pnp_double_with_profile_img.py).
-# Install AFTER the main stack:
-#   pip install -r requirements.txt
+# Convenience mirror of [project.optional-dependencies] img in pyproject.toml
+# — keep pins in sync.
+# Install AFTER the main stack, either:
+#   pip install -e ".[img]"
 #   pip install -r requirements-img.txt
 # Do NOT -r this file from requirements.txt or requirements-dev.txt.
 opencv-python-headless==4.10.0.84

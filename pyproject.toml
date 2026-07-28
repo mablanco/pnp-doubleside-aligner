@@ -20,8 +20,13 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest==7.4.4"]
-# Image-tool extras: declare when requirements-img.txt exists (feature 003).
-# Until then: pip install -r requirements-img.txt once that file is added.
+# Experimental image tool (tools/pnp_double_with_profile_img.py).
+# Mirror: requirements-img.txt — keep pins in sync.
+img = [
+    "opencv-python-headless==4.10.0.84",
+    "numpy==1.26.4",
+    "fpdf2==2.7.8",
+]
 
 [project.scripts]
 pnp-double-align = "pnp_double_with_profile_pdf:main"
