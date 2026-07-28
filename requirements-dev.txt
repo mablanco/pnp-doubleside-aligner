@@ -1,3 +1,5 @@
 # Dev-only dependencies (characterization / unit / integration suite).
+# Convenience mirror of main deps + [project.optional-dependencies] dev in pyproject.toml.
+# Prefer: pip install -e ".[dev]"
 -r requirements.txt
 pytest==7.4.4

@@ -6,11 +6,18 @@ Deterministic inputs used by the characterization suite and golden PDF net.
 
 | File | Pages | Purpose |
 |------|-------|---------|
-| `sample_interleaved.pdf` | 4 (F0,B1,F2,B3) | Even interleaved / vector geometry / goldens |
-| `sample_odd.pdf` | 3 | `fronts_then_backs` + `--on-odd` policies |
+| `sample_interleaved.pdf` | 4 (F,B,F,B) with shared back | Even interleaved / vector geometry / goldens / smart-detect |
+| `sample_fronts_then_backs.pdf` | 4 (F,F,B,B) with shared backs | Smart-detect fronts_then_backs |
+| `sample_single.pdf` | 1 | Smart-detect `single_sided` |
+| `sample_ambiguous_even.pdf` | 4 unique pages | Smart-detect inconclusive → `--even-default` |
+| `sample_odd.pdf` | 3 | Odd → `last_back`; also `fronts_then_backs` + `--on-odd` |
 
-Generated with PyMuPDF: fixed 200×200 pt pages, Helvetica labels, thin border.
-Regenerate only if intentional fixture change is required (will invalidate goldens).
+Smart-detect fixtures use full-page color fills and patterns so low-DPI
+fingerprints distinguish shared backs from unique fronts. Geometry/golden
+tests still use `sample_interleaved.pdf` (regenerate goldens after changing it).
+
+Generated with PyMuPDF: fixed 200×200 pt pages. Regenerate only if intentional
+fixture change is required (will invalidate goldens).
 
 ## Profiles
 
