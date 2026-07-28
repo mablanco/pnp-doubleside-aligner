@@ -7,6 +7,11 @@ These tools are optional and are not required for normal day-to-day usage.
 They are provided for advanced users who want deeper control over calibration,
 image-based PnPs, or batch workflows.
 
+**Packaging note**: editable install (`pip install -e .`) exposes only the main
+aligner as `pnp-double-align`. Everything under `tools/` stays **script-only**
+(invoke with `python tools/<script>.py`); there are no console entry points for
+these helpers in v1.
+
 ## Included tools
 
 ### pnp_calibration_sheet_duplex.py

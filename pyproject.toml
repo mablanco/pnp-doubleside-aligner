@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pnp-doubleside-aligner"
+version = "0.1.0"
+description = "Correct duplex misalignment when printing Print-and-Play (PnP) PDFs"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "mablanco" },
+]
+dependencies = [
+    "PyMuPDF==1.23.7",
+    "Pillow==10.2.0",
+    "reportlab==4.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==7.4.4"]
+# Image-tool extras: declare when requirements-img.txt exists (feature 003).
+# Until then: pip install -r requirements-img.txt once that file is added.
+
+[project.scripts]
+pnp-double-align = "pnp_double_with_profile_pdf:main"
+
+[project.urls]
+Homepage = "https://github.com/mablanco/pnp-doubleside-aligner"
+Repository = "https://github.com/mablanco/pnp-doubleside-aligner"
+
+[tool.setuptools]
+py-modules = [
+    "pnp_double_with_profile_pdf",
+    "geometry",
+    "profiles",
+    "io_pdf",
+]
