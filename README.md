@@ -78,9 +78,16 @@ pnp-double-align --help
 python -m pnp_double_with_profile_pdf --help
 ```
 
-Image-tool extras are **not** part of the default install. When
-`requirements-img.txt` is added (feature `003`), use that file or a future
-`pip install -e ".[img]"` extra; until then, keep the main PDF workflow.
+Image-tool extras are **not** part of the default install. For the
+**experimental** image PnP helper (`tools/pnp_double_with_profile_img.py`),
+install optional pins after the main stack:
+
+```bash
+pip install -r requirements-img.txt
+```
+
+Prefer the main PDF workflow for production duplex alignment. See
+`tools/README.md`.
 
 ### Requirements / loose-script workflow (still supported)
 
