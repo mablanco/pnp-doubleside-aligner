@@ -56,7 +56,33 @@ template customizations live under `.specify/templates/overrides/`.
 It is strongly recommended to use a **virtual environment (venv)** to avoid interfering
 with system-wide Python packages.
 
-### Using a virtual environment
+### Editable package install (recommended)
+
+Install the project so the main aligner is on your PATH as `pnp-double-align`,
+with runtime dependencies from `pyproject.toml`:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+python -m pip install -U pip
+python -m pip install -e .
+# contributors / tests (preferred):
+python -m pip install -e ".[dev]"
+```
+
+Then:
+
+```bash
+pnp-double-align --help
+# equivalent:
+python -m pnp_double_with_profile_pdf --help
+```
+
+Image-tool extras are **not** part of the default install. When
+`requirements-img.txt` is added (feature `003`), use that file or a future
+`pip install -e ".[img]"` extra; until then, keep the main PDF workflow.
+
+### Requirements / loose-script workflow (still supported)
 
 ```bash
 python3 -m venv .venv
@@ -66,6 +92,8 @@ python -m pip install -r requirements.txt
 python -m pip install -r requirements-dev.txt
 ```
 
+Pins in `requirements*.txt` mirror `pyproject.toml` — keep versions aligned.
+
 To deactivate the environment:
 
 ```bash
@@ -74,12 +102,15 @@ deactivate
 
 ### Tests and CI
 
+After `pip install -e ".[dev]"`:
+
 ```bash
-PYTHONPATH=. python -m pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
-Pull requests to `main` run the same suite on GitHub Actions (Python 3.9 and 3.12).
-`main` requires a green `ci-success` check before merge.
+Pull requests to `main` run the same suite on GitHub Actions (Python 3.9 and 3.12)
+via editable install with the `dev` extra. `main` requires a green `ci-success`
+check before merge.
 
 ### System packages (preferred when available)
 
@@ -90,11 +121,25 @@ This usually provides better integration, stability and easier updates.
 
 ## Basic Usage
 
+Installed CLI (after editable install):
+
+```bash
+pnp-double-align \
+  --input game.pdf \
+  --output game_aligned.pdf
+```
+
+Loose script (requirements workflow or from a clone):
+
 ```bash
 python pnp_double_with_profile_pdf.py \
   --input game.pdf \
   --output game_aligned.pdf
 ```
+
+Only the main duplex aligner is installed as a console command
+(`pnp-double-align`). Helpers under `tools/` remain script-only; see
+`tools/README.md`.
 
 ## Printer Profile
 
