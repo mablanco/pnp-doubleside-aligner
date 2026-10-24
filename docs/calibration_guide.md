@@ -1,149 +1,168 @@
 # Printer Calibration Guide
 
 This guide explains how to calibrate your printer so that front and back pages
-align correctly when printing Print-and-Play (PnP) PDFs.
+align correctly when printing Print-and-Play (PnP) PDFs double-sided.
 
-Calibration is based on measuring the physical behavior of your printer
-and encoding the correction into a reusable printer profile.
+Real duplex printers introduce small but consistent errors: rotation (skew)
+and a horizontal / vertical shift of the back. They are mechanical and
+repeatable, so you measure them once per printer configuration, store them in
+a profile and reuse it for every compatible PnP.
 
-## Overview
+You need three prints in total:
 
-Real printers introduce small but consistent errors when printing double-sided:
-- rotation (skew)
-- horizontal shift (X)
-- vertical shift (Y)
+1. **Margin test** – find print settings that print at 100 % with no offset.
+2. **Calibration sheet** – read the back offsets and generate the profile.
+3. **Verification** – the same sheet run through the aligner; refine if needed.
 
-These errors are mechanical and repeatable.
-Once measured, they can be compensated automatically for all compatible PnPs.
+All commands run from the repository root. Generated PDFs
+(`calibration_*.pdf`) and personal profiles (`profiles/*`) are gitignored.
 
-## Step 1: Generate calibration sheets
+## Step 1: Check the print settings (margin test)
 
-Calibration sheets are generated using the following script:
-
-```bash
-tools/pnp_calibration_sheet_duplex.py
-```
-
-Run the script from the root of the repository:
-```bash
-python tools/pnp_calibration_sheet_duplex.py
-```
-
-The script generates printable PDF files containing:
-- a FRONT calibration page
-- one or more BACK calibration pages
-- clear reference marks near the page edges
-- explicit TOP and feed-edge indicators
-
-These sheets are designed to make duplex misalignment and rotation visible.
-
-## Step 2: Print the calibration sheets
-
-Print the generated PDFs using exactly the same settings you plan to use
-for your PnP projects:
-
-- same printer
-- same paper type and weight
-- same paper tray
-- same duplex mode (long edge or short edge)
-- same orientation (portrait or landscape)
-- no scaling (100% size)
-
-Do not rotate or resize the PDF when printing.
-
-## Step 3: Measure the misalignment
-
-After printing, hold the sheet against a light source.
-
-Compare the FRONT and BACK reference marks and measure:
-- horizontal offset (X) in millimeters
-- vertical offset (Y) in millimeters
-- any visible rotation between front and back
-
-Take measurements at multiple reference points if possible.
-
-## Step 4: Create a printer profile
-
-Create a new printer profile based on the template:
+The aligner can only correct the printer. If the print dialog scales the page
+or shifts it, every calibration is wrong. Generate the margin test page:
 
 ```bash
-profiles/base_printer_profile.json
+python tools/pnp_margin_test_page.py --paper a4      # or --paper letter
 ```
 
-Copy and rename it, for example:
+Print it **double-sided** with the settings you plan to use for PnPs (printer,
+tray, paper type and weight). Each edge has three rulers that start exactly at
+the paper edge: the first visible tick is how many millimetres that edge does
+not print. Then check:
+
+- **Reference lines**: they must measure exactly 150 mm and 200 mm. Otherwise
+  the dialog is scaling the page.
+- **Opposite edges**: they should lose about the same (a few mm, the printer's
+  non-printable margin). If one edge prints from 0 and the opposite loses
+  twice the usual margin, the dialog is **shifting** the page.
+
+Try the scaling options of your print dialog until both checks pass, and use
+that option for every PnP from then on. Example (KDE / Okular, A4 laser):
+
+| Option | Result |
+|---|---|
+| Fit to printable area | page scaled by ~4 % (cards come out smaller) |
+| None / original size | page shifted 4.23 mm right and down (the declared margin): ~8.5 mm clipped on two edges and ~8.5 mm of extra front/back offset |
+| Fit to full page | 100 %, no shift ✔ |
+
+Other viewers and drivers name these options differently ("Actual size",
+"100 %", "Fit"…): the margin test tells you which one is right.
+
+Also note the real non-printable margin: important PnP content (cut lines,
+card edges) must stay inside it.
+
+## Step 2: Calibrate
+
+### 2.1 Generate the sheet
 
 ```bash
-my_printer_A4_200g.json
+python tools/pnp_calibration_sheet_duplex.py --orientation portrait --paper a4
+python tools/pnp_calibration_sheet_duplex.py --orientation landscape --paper a4
 ```
 
-Edit the file and fill in the measured values under back_corrections.
+Calibrate each orientation you print in: one profile per printer
+configuration, and portrait and landscape are different configurations.
 
-Positive values mean:
-- rotation: clockwise
-- X shift: move the back to the right
-- Y shift: move the back downward
+### 2.2 Print it
 
-Negative values move in the opposite direction.
+- Double-sided with the settings from step 1, **without** running the aligner.
+- **Portrait: flip on the long edge. Landscape: flip on the short edge.** The
+  sheet's backs are mirrored left-to-right, like the backs of typical PnP files.
 
-These sign conventions apply to **both** the preferred (vector) path and the
-raster fallback. Without `--profile` and without CLI overrides, corrections are
-identity (`0°, 0 mm, 0 mm`) — not sample skew.
+### 2.3 Read it
 
-Important: remove all comments before using the profile.
-The final file must be valid JSON. Templates under `profiles/` that contain
-comments must be copied and stripped before use with `--profile`.
+Hold the sheet against a window or a lamp and look **from the front side**
+(the one with the thick crosses `TL`, `TR`, `BL`, `BR`, `C`). Next to each
+cross you see two thin scales printed on the back:
 
-For `fronts_then_backs` with an odd page count, `--on-odd warn` prints a warning
-on stderr and continues; use `add_blank` or `drop_last` to change effective length.
+- **dx**: the number on the horizontal scale crossed by the thick vertical line.
+- **dy**: the number on the vertical scale crossed by the thick horizontal line.
 
-## Step 5: Iterate if needed
+Those numbers are directly the offset of the back in millimetres
+(dx > 0: back to the right, dy > 0: back lower). Halves are fine (0.5, -1.5).
+If the word **TOP** printed on the back reads upside down, the duplex flip mode
+is wrong: change it and print again.
 
-Calibration is usually an iterative process.
-
-1. Apply the profile using pnp_double_with_profile_pdf.py
-2. Print a test page
-3. Check alignment
-4. Adjust values in small steps
-
-Repeat until alignment is satisfactory.
-
-## Optional: Assisted calibration
-
-For advanced users, the following helper script is available:
-
-This script computes suggested correction values from the offsets measured
-at the four corner marks (and optionally the center mark). Each offset is
-`DX DY` in millimeters of the back relative to the front:
+### 2.4 Generate the profile
 
 ```bash
 python tools/pnp_calibration_solver.py \
-  --top-left 0.0 2.0 --top-right 0.0 0.2 \
-  --bottom-left 0.8 2.1 --bottom-right 1.0 0.5 \
-  --center 0.5 1.5 \
-  --output profiles/my_printer_A4_200g.json
+  --orientation portrait --paper a4 \
+  --top-left 0.5 0.5 --top-right 1 0 \
+  --bottom-left 1 0.5 --bottom-right 1.5 0 \
+  --center 1 0 \
+  --output profiles/my_printer_A4_portrait.json
 ```
 
-Paper size, orientation and flip mode default to A4 landscape / long edge
-(`--paper-width`, `--paper-height`, `--orientation`, `--flip-mode`).
-The script refuses to overwrite an existing profile unless `--force` is
-given; use `--output -` to print the JSON to stdout instead of writing a file.
+The solver fits a rotation and a shift to all readings (least squares) and
+prints the fit residual of each point. A warning means one reading does not fit
+the others: check it on the sheet. It never overwrites an existing file unless
+you pass `--force`; `--output -` prints the JSON instead.
 
-## Reusing the profile
+How the readings become corrections: you read from the front, but the aligner
+corrects the back page, which is mirrored left-to-right. The rotation and the X
+shift keep their sign as corrections and the Y shift is negated (the shift is
+also counter-rotated, which only matters for large skews). You never have to
+apply these sign rules by hand.
 
-Once calibrated, the same profile can be reused for all compatible PnP PDFs.
+## Step 3: Verify and refine
 
-Recalibration is only required if you change:
-- printer
-- paper type or weight
-- paper tray
-- duplex mode
-- page orientation
+Run the aligner on the calibration sheet with the new profile and print the
+result exactly as in step 2:
 
-## Notes and limitations
+```bash
+python pnp_double_with_profile_pdf.py \
+  --input calibration_sheet_portrait_a4.pdf \
+  --output calibration_sheet_portrait_a4_verify.pdf \
+  --profile profiles/my_printer_A4_portrait.json --order interleaved
+```
 
-- This calibration assumes that PnP PDFs are properly centered on the page.
-- The script corrects printer errors, not layout errors.
-- Poorly centered PDFs must be fixed before calibration.
+Read it the same way. Readings of 0 or ±0.5 mm are as good as it gets (sheet
+to sheet variation and reading precision). If there is a consistent residual
+(for example every dx is +0.5), add it to the profile:
 
-Calibration may take some time, but it only needs to be done once.
-After that, duplex-aligned PnP printing becomes repeatable and reliable.
+```bash
+python tools/pnp_calibration_solver.py \
+  --orientation portrait --paper a4 \
+  --top-left 0.5 0 --top-right 0.5 0 \
+  --bottom-left 0.5 0 --bottom-right 0.5 0 \
+  --refine profiles/my_printer_A4_portrait.json \
+  --output profiles/my_printer_A4_portrait.json --force
+```
+
+`--refine` keeps every field of the profile and adds the residual correction
+to `back_corrections`. Do not chase isolated ±0.5 mm readings: they are noise.
+
+## Printing PnPs with the profile
+
+```bash
+python pnp_double_with_profile_pdf.py \
+  --input game.pdf --output game_aligned.pdf \
+  --profile profiles/my_printer_A4_portrait.json
+```
+
+Print the aligned PDF with the same settings as the calibration (scaling
+option from step 1, same flip edge for the orientation).
+
+## About `flip_mode`
+
+In the profile, `flip_mode` does not describe the print dialog option. It only
+tells the aligner whether to rotate the backs 180° (`short`) or not (`long`).
+PnP files whose backs are mirrored left-to-right (the usual layout, and the
+calibration sheet's) need `long` in both orientations, which is what the
+solver writes. Use `short` only for files whose backs are mirrored
+top-to-bottom instead: rotating them 180° turns that layout into the
+left-to-right one the calibration assumes.
+
+## Recalibrate when you change
+
+- printer, tray, paper type or weight
+- print-dialog scaling option or duplex settings
+- orientation (keep one profile per orientation)
+
+## Without automatic duplex
+
+Print the front, put the sheet back in the tray so that the back prints on the
+other side flipped as described above, and print the back. The calibration
+then captures your manual feeding; keep the same procedure for your PnPs.

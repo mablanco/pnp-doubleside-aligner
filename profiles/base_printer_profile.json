@@ -25,15 +25,21 @@
     "y_mm": 0.0
   },
 
-  // Paper flip mode when printing double-sided:
-  //  - "long"  → flip on the long edge (like turning pages in a book)
-  //  - "short" → flip on the short edge (like flipping a notepad)
+  // Whether the aligner rotates the backs 180 degrees:
+  //  - "long"  → no rotation. For PnP files whose backs are mirrored
+  //              left-to-right (the usual layout). Use it in portrait (print
+  //              dialog: flip on long edge) and landscape (flip on short edge).
+  //  - "short" → rotate backs 180° (files with backs mirrored top-to-bottom).
+  // tools/pnp_calibration_solver.py always writes "long".
   "flip_mode": "long",
 
   "back_corrections": {
     // Corrections applied to the back side only
     // These values compensate for the physical misalignment
     // introduced by the printer duplex mechanism.
+    // Directions below are on the back page itself (as in the PDF), which is
+    // mirrored left-to-right with respect to the front once printed.
+    // Generate them with tools/pnp_calibration_solver.py instead of by hand.
 
     // Rotation in degrees (°)
     // Positive value = clockwise rotation

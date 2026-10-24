@@ -41,4 +41,5 @@ py-modules = [
     "geometry",
     "profiles",
     "io_pdf",
+    "calibration",
 ]
