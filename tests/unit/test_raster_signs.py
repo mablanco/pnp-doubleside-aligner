@@ -16,13 +16,27 @@ def test_raster_positive_rot_negates_for_pil_clockwise(monkeypatch):
     img = Image.new("RGB", (10, 10), "white")
     seen = {}
 
-    def fake_rotate(self, angle, resample=None, expand=False):
+    def fake_rotate(self, angle, resample=None, expand=False, **kwargs):
         seen["angle"] = angle
         return self
 
     monkeypatch.setattr(Image.Image, "rotate", fake_rotate)
     apply_back_transform_raster(img, 3.5, False)
     assert seen["angle"] == -3.5
+
+
+def test_raster_rotation_fills_uncovered_corners_white():
+    """Rotating must not leave black wedges in the corners."""
+    img = Image.new("RGB", (200, 280), "white")
+    out = apply_back_transform_raster(img, 3.0, False)
+    for xy in [(0, 0), (199, 0), (0, 279), (199, 279)]:
+        assert out.getpixel(xy) == (255, 255, 255)
+
+
+def test_raster_rotate180_keeps_white_page_white():
+    img = Image.new("RGB", (200, 280), "white")
+    out = apply_back_transform_raster(img, 0.3, True)
+    assert out.getextrema() == ((255, 255), (255, 255), (255, 255))
 
 
 def test_raster_y_down_uses_negative_reportlab_y(monkeypatch):

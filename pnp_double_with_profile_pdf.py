@@ -189,15 +189,20 @@ def render_page_image(
 def apply_back_transform_raster(
     img: Image.Image, extra_rot: float, rotate180: bool
 ) -> Image.Image:
-    """Apply raster transforms; positive extra_rot is clockwise."""
+    """Apply raster transforms; positive extra_rot is clockwise.
+
+    Corners uncovered by the rotation are filled with white (PIL's default is
+    black, which would print dark wedges along the page edges).
+    """
     if abs(extra_rot) > 1e-6:
         img = img.rotate(
             raster_rotation_angle(extra_rot),
             resample=Image.BICUBIC,
             expand=False,
+            fillcolor="white",
         )
     if rotate180:
-        img = img.rotate(180, resample=Image.BICUBIC, expand=False)
+        img = img.rotate(180, resample=Image.BICUBIC, expand=False, fillcolor="white")
     return img
 
 
