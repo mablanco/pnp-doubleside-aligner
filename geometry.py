@@ -58,33 +58,25 @@ def build_back_matrix(
     - positive X = right
     - positive Y = downward → PDF user-space Y is up, so translate by -shift_y
     """
+    # fitz composes left-to-right (A * B applies A first). Same order as the
+    # raster path: clockwise rotation about the page center, then the optional
+    # 180° turn (also about the center), then the shift in final page space.
+    cx = rect.width / 2.0
+    cy = rect.height / 2.0
+    to_origin = fitz.Matrix(1, 0, 0, 1, -cx, -cy)
+    back = fitz.Matrix(1, 0, 0, 1, cx, cy)
     M = fitz.Matrix(1, 0, 0, 1, 0, 0)
 
     if abs(extra_rot) > 1e-6:
-        cx = rect.width / 2.0
-        cy = rect.height / 2.0
         # fitz.Matrix(degrees) is counter-clockwise; negate for clockwise contract
-        M = (
-            fitz.Matrix(1, 0, 0, 1, cx, cy)
-            * fitz.Matrix(-extra_rot)
-            * fitz.Matrix(1, 0, 0, 1, -cx, -cy)
-            * M
-        )
+        M = M * to_origin * fitz.Matrix(-extra_rot) * back
 
     if rotate180:
-        cx = rect.width / 2.0
-        cy = rect.height / 2.0
-        M = (
-            fitz.Matrix(1, 0, 0, 1, cx, cy)
-            * fitz.Matrix(180)
-            * fitz.Matrix(1, 0, 0, 1, -cx, -cy)
-            * M
-        )
+        M = M * to_origin * fitz.Matrix(180) * back
 
     if abs(shift_x_pt) > 1e-6 or abs(shift_y_pt) > 1e-6:
         # PDF +Y is up; contract +Y is down
-        shift_matrix = fitz.Matrix(1, 0, 0, 1, shift_x_pt, -shift_y_pt)
-        M = shift_matrix * M
+        M = M * fitz.Matrix(1, 0, 0, 1, shift_x_pt, -shift_y_pt)
 
     return M
 
