@@ -111,11 +111,22 @@ Repeat until alignment is satisfactory.
 
 For advanced users, the following helper script is available:
 
+This script computes suggested correction values from the offsets measured
+at the four corner marks (and optionally the center mark). Each offset is
+`DX DY` in millimeters of the back relative to the front:
+
 ```bash
-tools/pnp_calibration_solver.py
+python tools/pnp_calibration_solver.py \
+  --top-left 0.0 2.0 --top-right 0.0 0.2 \
+  --bottom-left 0.8 2.1 --bottom-right 1.0 0.5 \
+  --center 0.5 1.5 \
+  --output profiles/my_printer_A4_200g.json
 ```
 
-This script can compute suggested correction values from measured offsets.
+Paper size, orientation and flip mode default to A4 landscape / long edge
+(`--paper-width`, `--paper-height`, `--orientation`, `--flip-mode`).
+The script refuses to overwrite an existing profile unless `--force` is
+given; use `--output -` to print the JSON to stdout instead of writing a file.
 
 ## Reusing the profile
 
