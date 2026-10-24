@@ -26,6 +26,17 @@ Features:
 - Takes measured offsets (dx, dy) from multiple reference points
 - Estimates average X/Y shift and rotation (skew)
 - Outputs values suitable for a printer profile JSON
+- Never overwrites an existing profile unless `--force` is given
+
+Example:
+
+```bash
+python tools/pnp_calibration_solver.py \
+  --top-left 0.0 2.0 --top-right 0.0 0.2 \
+  --bottom-left 0.8 2.1 --bottom-right 1.0 0.5 \
+  --center 0.5 1.5 \
+  --output profiles/my_printer_A4_200g.json
+```
 
 ### pnp_double_with_profile_img.py (**experimental**)
 
