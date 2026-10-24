@@ -182,29 +182,32 @@ are gitignored on purpose so local calibration data is not published.
 
 ## Calibration
 
-Calibration is performed using a dedicated script that generates printable
-calibration sheets on demand.
+Calibration takes three prints and no ruler (step by step in
+`docs/calibration_guide.md`):
 
-### Generate calibration sheets
+1. **Margin test** – find the print-dialog scaling option that prints at 100 %
+   with no offset:
 
-Run the following script from the repository root:
+   ```bash
+   python tools/pnp_margin_test_page.py --paper a4
+   ```
 
-```bash
-python tools/pnp_calibration_sheet_duplex.py
-```
+2. **Calibration sheet** – print it double-sided (portrait: long edge;
+   landscape: short edge), read the back offsets at the four corners against
+   the light and turn them into a profile:
 
-This script generates FRONT and BACK calibration pages with clear visual markers
-to reveal duplex misalignment and rotation.
+   ```bash
+   python tools/pnp_calibration_sheet_duplex.py --orientation portrait --paper a4
+   python tools/pnp_calibration_solver.py \
+     --top-left DX DY --top-right DX DY --bottom-left DX DY --bottom-right DX DY \
+     --output profiles/my_printer_A4_portrait.json
+   ```
 
-### Follow the calibration guide
+3. **Verification** – run the aligner on the sheet with the profile, print it
+   again and, if a residual remains, add it with `--refine`.
 
-A complete, step-by-step calibration guide is provided here:
-
-```bash
-docs/calibration_guide.md
-```
-
-Calibration is required only once per printer configuration.
+Calibration is required only once per printer configuration (printer, paper,
+scaling option, orientation).
 
 ## Page Order Modes
 
