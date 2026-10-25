@@ -8,7 +8,9 @@ calibration sheet (tools/pnp_calibration_sheet_duplex.py).
 
 Each reading is DX DY in millimetres, as read on the sheet from the FRONT
 side: the offset of the back (dx > 0: right, dy > 0: down). The solver fits a
-rotation + shift by least squares and writes the profile corrections.
+rotation + shift by least squares and writes the profile corrections; with
+--fit-scale it also fits an X/Y scale difference (paper shrinking between the
+two passes of a manual duplex, for example) and writes scale_x / scale_y.
 
 Verification / refinement: run the aligner on the calibration sheet with the
 profile, print it again, read the residual offsets and pass them with
@@ -61,6 +63,9 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
                    help="Orientation of the sheet that was read (default: portrait).")
     p.add_argument("--paper", choices=sorted(cal.PAPER_SIZES_MM), default="a4",
                    help="Paper of the sheet that was read (default: a4).")
+    p.add_argument("--fit-scale", action="store_true",
+                   help="Also fit an X/Y scale difference between back and front (e.g. paper "
+                        "shrinking between the two passes) and write scale_x/scale_y.")
     p.add_argument("--refine", metavar="PROFILE",
                    help="Treat the readings as residuals of a verification print and "
                         "add their correction to this existing profile.")
@@ -71,13 +76,12 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
+DECIMALS = {"extra_rot_deg": 3, "shift_x_mm": 2, "shift_y_mm": 2, "scale_x": 4, "scale_y": 4}
+
+
 def _rounded(bc: Dict[str, float]) -> Dict[str, float]:
     # + 0.0 turns -0.0 into 0.0 in the JSON output
-    return {
-        "extra_rot_deg": round(bc["extra_rot_deg"], 3) + 0.0,
-        "shift_x_mm": round(bc["shift_x_mm"], 2) + 0.0,
-        "shift_y_mm": round(bc["shift_y_mm"], 2) + 0.0,
-    }
+    return {k: round(v, DECIMALS[k]) + 0.0 for k, v in bc.items()}
 
 
 def _append_note(notes: Any, note: str) -> Any:
@@ -96,7 +100,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         val = getattr(args, key)
         if val is not None:
             readings[key] = (val[0], val[1])
-    fit = cal.fit_readings(readings, w_mm, h_mm)
+    fit = cal.fit_readings(readings, w_mm, h_mm, fit_scale=args.fit_scale)
     delta = cal.to_back_corrections(fit)
     read_txt = ", ".join(f"{k} {v[0]:g}/{v[1]:g}" for k, v in readings.items())
 
@@ -109,7 +113,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"Error: cannot use base profile {args.refine}: {exc}", file=sys.stderr)
             return 1
         profile = dict(raw)
-        profile["back_corrections"] = _rounded(cal.refine_corrections(base["back_corrections"], delta))
+        base_bc = dict(base["back_corrections"])
+        raw_bc = raw.get("back_corrections") or {}
+        for key in ("scale_x", "scale_y"):
+            # load_profile fills scales with 1.0; keep them only if really used
+            if key not in raw_bc:
+                base_bc.pop(key, None)
+        profile["back_corrections"] = _rounded(cal.refine_corrections(base_bc, delta))
         if args.name:
             profile["name"] = args.name
         profile["_notes"] = _append_note(
@@ -150,8 +160,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     bc = profile["back_corrections"]
     print(f"Measured (front view): rotation {fit.rot_deg:+.3f} deg, "
           f"shift X {fit.tx_mm:+.2f} mm, Y {fit.ty_mm:+.2f} mm", file=info)
-    print(f"Profile corrections: extra_rot_deg={bc['extra_rot_deg']}, "
-          f"shift_x_mm={bc['shift_x_mm']}, shift_y_mm={bc['shift_y_mm']}", file=info)
+    if fit.scale_fitted:
+        print(f"Measured scale of the back (front view): X {fit.scale_x:.4f}, Y {fit.scale_y:.4f}", file=info)
+    print("Profile corrections: " + ", ".join(f"{k}={v}" for k, v in bc.items()), file=info)
     print("Fit residuals (mm): " + ", ".join(f"{k} {v:.2f}" for k, v in fit.residuals_mm.items()), file=info)
     worst = max(fit.residuals_mm, key=fit.residuals_mm.get)
     if fit.residuals_mm[worst] > RESIDUAL_WARNING_MM:

@@ -88,3 +88,27 @@ def test_build_back_matrix_positive_x_shifts_right():
     M = build_back_matrix(rect, 0.0, False, shift, 0.0)
     assert abs(M.e - shift) < 1e-6
     assert abs(M.f) < 1e-9
+
+
+def test_build_back_matrix_scale_keeps_center_and_scales_distances():
+    rect = fitz.Rect(0, 0, 595, 842)
+    M = build_back_matrix(rect, 0.0, False, 0.0, 0.0, scale_x=0.99, scale_y=1.02)
+    assert _apply(M, 297.5, 421) == pytest.approx((297.5, 421))
+    assert _apply(M, 397.5, 521) == pytest.approx((297.5 + 99.0, 421 + 102.0))
+
+
+def test_build_back_matrix_default_scale_is_identity():
+    rect = fitz.Rect(0, 0, 200, 200)
+    a = build_back_matrix(rect, 1.0, False, 3.0, 4.0)
+    b = build_back_matrix(rect, 1.0, False, 3.0, 4.0, scale_x=1.0, scale_y=1.0)
+    for attr in ("a", "b", "c", "d", "e", "f"):
+        assert getattr(a, attr) == pytest.approx(getattr(b, attr))
+
+
+def test_build_back_matrix_rotates_before_scaling():
+    """Order rotation → scale (needed for an exact calibration mapping)."""
+    rect = fitz.Rect(0, 0, 200, 200)
+    M = build_back_matrix(rect, 90.0, False, 0.0, 0.0, scale_x=0.5, scale_y=1.0)
+    # 100 pt right of the centre → clockwise 90° → 100 pt below (PDF Y up);
+    # scale_x then leaves it untouched. Scaling first would give 50 pt.
+    assert _apply(M, 200, 100) == pytest.approx((100, 0), abs=1e-6)

@@ -39,6 +39,17 @@ def test_raster_rotate180_keeps_white_page_white():
     assert out.getextrema() == ((255, 255), (255, 255), (255, 255))
 
 
+def test_raster_scale_keeps_center_and_fills_white():
+    img = Image.new("RGB", (201, 201), "white")
+    img.putpixel((100, 100), (0, 0, 0))
+    img.putpixel((180, 100), (0, 0, 0))
+    out = apply_back_transform_raster(img, 0.0, False, scale_x=0.5, scale_y=1.0)
+    assert out.getpixel((100, 100))[0] < 200  # centre stays put
+    assert out.getpixel((140, 100))[0] < 200  # 80 px from the centre → 40 px
+    assert out.getpixel((180, 100)) == (255, 255, 255)
+    assert out.getpixel((0, 0)) == (255, 255, 255)
+
+
 def test_raster_y_down_uses_negative_reportlab_y(monkeypatch):
     """ReportLab origin is bottom-left; +Y down → draw at -shift_y_pt."""
     img = Image.new("RGB", (20, 20), "white")

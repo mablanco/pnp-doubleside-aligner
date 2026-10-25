@@ -109,6 +109,7 @@ def _read_sheet(
     printer_shift: Point,
     w: float,
     h: float,
+    printer_scale: Point = (1.0, 1.0),
 ) -> Dict[str, Point]:
     rect = fitz.Rect(0, 0, mm_to_pt(w), mm_to_pt(h))
     m = build_back_matrix(
@@ -117,6 +118,8 @@ def _read_sheet(
         False,
         mm_to_pt(corrections["shift_x_mm"]),
         mm_to_pt(corrections["shift_y_mm"]),
+        scale_x=corrections.get("scale_x", 1.0),
+        scale_y=corrections.get("scale_y", 1.0),
     )
     a = math.radians(printer_rot_deg)
     cx, cy = w / 2, h / 2
@@ -126,8 +129,9 @@ def _read_sheet(
         p = fitz.Point(mm_to_pt(xb), mm_to_pt(h - yb)) * m  # PDF space, Y up
         xb, yb = p.x * 25.4 / 72, h - p.y * 25.4 / 72
         xf, yf = w - xb, yb  # seen from the front
-        # clockwise rotation for Y down about the centre, then shift
-        vx, vy = xf - cx, yf - cy
+        # printer: back printed larger/smaller (scale), rotated clockwise for
+        # Y down about the centre, then shifted
+        vx, vy = (xf - cx) * printer_scale[0], (yf - cy) * printer_scale[1]
         xf = cx + vx * math.cos(a) - vy * math.sin(a) + printer_shift[0]
         yf = cy + vx * math.sin(a) + vy * math.cos(a) + printer_shift[1]
         out[name] = (xf - tx, yf - ty)
@@ -159,3 +163,50 @@ def test_round_trip_refine_converges_from_a_partial_profile():
     refined = cal.refine_corrections(partial, delta)
     after = _read_sheet(refined, -0.3, (1.4, 0.3), w, h)
     assert max(math.hypot(dx, dy) for dx, dy in after.values()) < 0.01
+
+
+def test_fit_with_scale_recovers_all_parameters():
+    w, h = cal.page_size_mm("a4", "portrait")
+    readings = _read_sheet(IDENTITY, -0.3, (1.2, -0.4), w, h, printer_scale=(1.004, 0.998))
+    fit = cal.fit_readings(readings, w, h, fit_scale=True)
+    assert fit.rot_deg == pytest.approx(-0.3, abs=1e-6)
+    assert (fit.scale_x, fit.scale_y) == pytest.approx((1.004, 0.998), abs=1e-6)
+    assert max(fit.residuals_mm.values()) < 1e-5
+
+
+def test_fit_without_scale_keeps_unit_scale():
+    w, h = cal.page_size_mm("a4", "portrait")
+    readings = _read_sheet(IDENTITY, 0.2, (1.0, 0.0), w, h, printer_scale=(1.004, 1.0))
+    fit = cal.fit_readings(readings, w, h)
+    assert (fit.scale_x, fit.scale_y) == (1.0, 1.0)
+    assert "scale_x" not in cal.to_back_corrections(fit)
+
+
+@pytest.mark.parametrize("orientation", ["portrait", "landscape"])
+@pytest.mark.parametrize(
+    "rot,shift,scale",
+    [(0.0, (0.0, 0.0), (1.004, 1.0)), (-0.2, (1.4, -0.3), (1.004, 0.999)), (1.0, (-5.0, 5.0), (0.99, 1.01))],
+)
+def test_round_trip_with_scale_cancels_printer_error(orientation, rot, shift, scale):
+    w, h = cal.page_size_mm("a4", orientation)
+    readings = _read_sheet(IDENTITY, rot, shift, w, h, printer_scale=scale)
+    corrections = cal.to_back_corrections(cal.fit_readings(readings, w, h, fit_scale=True))
+    residual = _read_sheet(corrections, rot, shift, w, h, printer_scale=scale)
+    worst = max(math.hypot(dx, dy) for dx, dy in residual.values())
+    assert worst < 0.01
+
+
+def test_refine_multiplies_scales():
+    base = {"extra_rot_deg": -0.1, "shift_x_mm": 1.0, "shift_y_mm": 0.0, "scale_x": 0.998}
+    delta = {"extra_rot_deg": 0.0, "shift_x_mm": 0.0, "shift_y_mm": 0.0, "scale_x": 0.998, "scale_y": 1.001}
+    out = cal.refine_corrections(base, delta)
+    assert out["scale_x"] == pytest.approx(0.998 * 0.998)
+    assert out["scale_y"] == pytest.approx(1.001)
+
+
+def test_refine_without_scales_adds_no_scale_keys():
+    out = cal.refine_corrections(
+        {"extra_rot_deg": 0.1, "shift_x_mm": 1.0, "shift_y_mm": 0.0},
+        {"extra_rot_deg": 0.1, "shift_x_mm": 1.0, "shift_y_mm": 0.0},
+    )
+    assert set(out) == {"extra_rot_deg", "shift_x_mm", "shift_y_mm"}

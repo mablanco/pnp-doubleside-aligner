@@ -161,6 +161,8 @@ Profiles describe:
 - paper size and orientation
 - duplex flip mode
 - rotation and X/Y shifts applied to back pages
+- optional X/Y scale factors for backs that print larger or smaller than the
+  fronts (e.g. paper shrinking in a manual duplex)
 
 Profiles are reusable across all compatible PnP PDFs.
 
@@ -234,7 +236,7 @@ Force raster output:
 Override profile values from the command line:
 
 ```bash
---rot 0.28 --shiftx 0.8 --shifty 1.2
+--rot 0.28 --shiftx 0.8 --shifty 1.2 --scalex 0.996
 ```
 
 ## Tools

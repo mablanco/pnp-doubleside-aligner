@@ -49,6 +49,8 @@ def build_back_matrix(
     rotate180: bool,
     shift_x_pt: float,
     shift_y_pt: float,
+    scale_x: float = 1.0,
+    scale_y: float = 1.0,
 ) -> fitz.Matrix:
     """
     Build the PDF transformation matrix for a back page.
@@ -57,10 +59,12 @@ def build_back_matrix(
     - positive rotation = clockwise → PDF Matrix uses negated CCW angle
     - positive X = right
     - positive Y = downward → PDF user-space Y is up, so translate by -shift_y
+    - scale_x / scale_y < 1 shrink the back towards the page centre
     """
     # fitz composes left-to-right (A * B applies A first). Same order as the
-    # raster path: clockwise rotation about the page center, then the optional
-    # 180° turn (also about the center), then the shift in final page space.
+    # raster path: clockwise rotation about the page center, then the scale
+    # (also about the center; rotating first makes the calibration mapping
+    # exact), then the optional 180° turn, then the shift in final page space.
     cx = rect.width / 2.0
     cy = rect.height / 2.0
     to_origin = fitz.Matrix(1, 0, 0, 1, -cx, -cy)
@@ -70,6 +74,9 @@ def build_back_matrix(
     if abs(extra_rot) > 1e-6:
         # fitz.Matrix(degrees) is counter-clockwise; negate for clockwise contract
         M = M * to_origin * fitz.Matrix(-extra_rot) * back
+
+    if abs(scale_x - 1.0) > 1e-9 or abs(scale_y - 1.0) > 1e-9:
+        M = M * to_origin * fitz.Matrix(scale_x, 0, 0, scale_y, 0, 0) * back
 
     if rotate180:
         M = M * to_origin * fitz.Matrix(180) * back

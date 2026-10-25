@@ -55,7 +55,14 @@
     // Vertical shift in millimeters
     // Positive value = move the back downward
     // Negative value = move the back upward
-    "shift_y_mm": 0.0
+    "shift_y_mm": 0.0,
+
+    // Optional scale factors about the page centre (default 1.0, range 0.9-1.1)
+    // Use them when the back prints slightly larger or smaller than the front,
+    // e.g. paper shrinking between the two passes of a manual duplex.
+    // 0.996 = shrink the back by 0.4 %. Fit them with the solver's --fit-scale.
+    "scale_x": 1.0,
+    "scale_y": 1.0
   },
 
   "_notes": "Base template. Fill in these values after calibrating using the FRONT/BACK test sheets."

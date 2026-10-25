@@ -134,6 +134,37 @@ python tools/pnp_calibration_solver.py \
 `--refine` keeps every field of the profile and adds the residual correction
 to `back_corrections`. Do not chase isolated ±0.5 mm readings: they are noise.
 
+## Step 4 (optional): Scale differences between front and back
+
+With manual duplex on a laser printer, the sheet goes through the fuser for the
+front, loses moisture and shrinks slightly, mostly across the grain. The back
+is then printed at nominal size on a smaller sheet, so it comes out slightly
+larger than the front (typically 0.2–0.5 %). Rotation and shift cannot fix
+it: on a card grid the outermost column on one side matches and the error
+grows towards the other side (about 0.8 mm across A4 for 0.4 %).
+
+To check, print a page with outlines only (for example card cut lines on both
+sides) through the aligner and compare the edges against the light: a constant
+offset is a shift, an offset that grows across the page is a scale.
+
+To correct it, add `--fit-scale` to the solver (on the calibration readings or,
+with `--refine`, on the verification readings):
+
+```bash
+python tools/pnp_calibration_solver.py --fit-scale \
+  --top-left -0.4 0 --top-right 0.4 0 \
+  --bottom-left -0.4 0 --bottom-right 0.4 0 \
+  --refine profiles/my_printer_A4_portrait.json \
+  --output profiles/my_printer_A4_portrait.json --force
+```
+
+The profile gets `scale_x` / `scale_y` factors (0.996 shrinks the back by
+0.4 %) applied about the page centre, after the rotation and before the shift.
+You can also try a value directly with `--scalex 0.996` on the aligner. The
+calibration sheet reads in 0.5 mm steps over 160 mm, so only trust scales above
+~0.3 %; smaller ones are within reading noise. Letting the sheets rest a few
+minutes before feeding them back usually reduces the effect.
+
 ## Printing PnPs with the profile
 
 ```bash
