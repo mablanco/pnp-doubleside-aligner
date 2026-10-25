@@ -53,3 +53,27 @@ def test_load_profile_comments_raise(fixtures_dir: Path):
 def test_load_profile_nonzero_fixture(fixtures_dir: Path):
     rot, sx, sy = _corrections(load_profile(str(fixtures_dir / "profile_nonzero.json")))
     assert (rot, sx, sy) == (2.0, 3.0, 4.0)
+
+
+def test_load_profile_scale_defaults_to_one(tmp_path: Path):
+    path = tmp_path / "p.json"
+    path.write_text(json.dumps({"back_corrections": {"shift_x_mm": 1}}), encoding="utf-8")
+    bc = load_profile(str(path))["back_corrections"]
+    assert (bc["scale_x"], bc["scale_y"]) == (1.0, 1.0)
+    assert load_profile(None)["back_corrections"]["scale_x"] == 1.0
+
+
+@pytest.mark.parametrize("value", ["big", 0.5, 1.2, 0])
+def test_load_profile_invalid_scale_raises(tmp_path: Path, value):
+    path = tmp_path / "p.json"
+    path.write_text(json.dumps({"back_corrections": {"scale_x": value}}), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_profile(str(path))
+
+
+def test_cli_overrides_scale():
+    from profiles import apply_cli_overrides
+
+    prof = apply_cli_overrides(load_profile(None), scalex=0.996, scaley=1.001)
+    assert prof["back_corrections"]["scale_x"] == 0.996
+    assert prof["back_corrections"]["scale_y"] == 1.001

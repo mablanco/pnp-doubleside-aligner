@@ -40,7 +40,7 @@ from geometry import (
     reportlab_shift_y,
 )
 from io_pdf import safe_replace_file, safe_save
-from profiles import apply_cli_overrides, load_profile
+from profiles import SCALE_RANGE, apply_cli_overrides, load_profile
 
 # Re-export for tests that import from this module
 __all__ = [
@@ -122,6 +122,8 @@ def process_pdf_vector(
         extra_rot = float(bc.get("extra_rot_deg", 0.0))
         shift_x_pt = mm_to_pt(float(bc.get("shift_x_mm", 0.0)))
         shift_y_pt = mm_to_pt(float(bc.get("shift_y_mm", 0.0)))
+        scale_x = float(bc.get("scale_x", 1.0))
+        scale_y = float(bc.get("scale_y", 1.0))
         rotate180 = flip_mode == "short"
 
         total = len(src)
@@ -141,7 +143,8 @@ def process_pdf_vector(
                 copy_pdf_page(out, src, i, rect)
             else:
                 matrix = build_back_matrix(
-                    rect, extra_rot, rotate180, shift_x_pt, shift_y_pt
+                    rect, extra_rot, rotate180, shift_x_pt, shift_y_pt,
+                    scale_x=scale_x, scale_y=scale_y,
                 )
                 copy_pdf_page(out, src, i, rect, matrix=matrix)
 
@@ -187,11 +190,16 @@ def render_page_image(
 
 
 def apply_back_transform_raster(
-    img: Image.Image, extra_rot: float, rotate180: bool
+    img: Image.Image,
+    extra_rot: float,
+    rotate180: bool,
+    scale_x: float = 1.0,
+    scale_y: float = 1.0,
 ) -> Image.Image:
     """Apply raster transforms; positive extra_rot is clockwise.
 
-    Corners uncovered by the rotation are filled with white (PIL's default is
+    Same order as the vector path: rotation, scale (about the centre), 180°.
+    Areas uncovered by the transforms are filled with white (PIL's default is
     black, which would print dark wedges along the page edges).
     """
     if abs(extra_rot) > 1e-6:
@@ -199,6 +207,16 @@ def apply_back_transform_raster(
             raster_rotation_angle(extra_rot),
             resample=Image.BICUBIC,
             expand=False,
+            fillcolor="white",
+        )
+    if abs(scale_x - 1.0) > 1e-9 or abs(scale_y - 1.0) > 1e-9:
+        # AFFINE maps each output pixel back to its source pixel
+        cx, cy = (img.width - 1) / 2.0, (img.height - 1) / 2.0
+        img = img.transform(
+            img.size,
+            Image.AFFINE,
+            (1 / scale_x, 0, cx - cx / scale_x, 0, 1 / scale_y, cy - cy / scale_y),
+            resample=Image.BICUBIC,
             fillcolor="white",
         )
     if rotate180:
@@ -266,6 +284,8 @@ def raster_fallback(
     extra_rot = float(bc.get("extra_rot_deg", 0.0))
     shift_x_pt = mm_to_pt(float(bc.get("shift_x_mm", 0.0)))
     shift_y_pt = mm_to_pt(float(bc.get("shift_y_mm", 0.0)))
+    scale_x = float(bc.get("scale_x", 1.0))
+    scale_y = float(bc.get("scale_y", 1.0))
     flip_mode = (flip_mode_override or profile.get("flip_mode", "short")).lower()
     rotate180 = flip_mode == "short"
 
@@ -296,7 +316,9 @@ def raster_fallback(
             img, rect = render_page_image(src, i, total, dpi)
 
             if i < total and is_back_page(i, total_eff, order):
-                img = apply_back_transform_raster(img, extra_rot, rotate180)
+                img = apply_back_transform_raster(
+                    img, extra_rot, rotate180, scale_x=scale_x, scale_y=scale_y
+                )
                 x_shift, y_shift = shift_x_pt, shift_y_pt
             else:
                 x_shift, y_shift = 0.0, 0.0
@@ -339,6 +361,18 @@ def _emit_odd_warning(total: int, order: str, on_odd: str) -> None:
             "drop_last to change effective length).",
             file=sys.stderr,
         )
+
+
+def _scale_arg(value: str) -> float:
+    """argparse type for --scalex/--scaley: a factor within SCALE_RANGE."""
+    try:
+        factor = float(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"invalid scale factor: {value!r}") from None
+    lo, hi = SCALE_RANGE
+    if not lo <= factor <= hi:
+        raise argparse.ArgumentTypeError(f"scale factor must be between {lo} and {hi}, got {factor}")
+    return factor
 
 
 def _fail(message: str, code: int = 1) -> None:
@@ -384,6 +418,8 @@ def main() -> None:
     ap.add_argument("--rot", type=float, help="Override extra_rot_deg (degrees).")
     ap.add_argument("--shiftx", type=float, help="Override shift_x_mm (millimeters).")
     ap.add_argument("--shifty", type=float, help="Override shift_y_mm (millimeters).")
+    ap.add_argument("--scalex", type=_scale_arg, help="Override scale_x (factor, e.g. 0.996).")
+    ap.add_argument("--scaley", type=_scale_arg, help="Override scale_y (factor, e.g. 0.996).")
     ap.add_argument(
         "--mode",
         default="auto",
@@ -426,7 +462,12 @@ def main() -> None:
         _fail(f"Invalid profile: {exc}")
 
     apply_cli_overrides(
-        profile, rot=args.rot, shiftx=args.shiftx, shifty=args.shifty
+        profile,
+        rot=args.rot,
+        shiftx=args.shiftx,
+        shifty=args.shifty,
+        scalex=args.scalex,
+        scaley=args.scaley,
     )
 
     try:
@@ -508,7 +549,8 @@ def main() -> None:
     print(
         f"Corrections: "
         f"rotation={bc['extra_rot_deg']}°, "
-        f"shift=({bc['shift_x_mm']} mm, {bc['shift_y_mm']} mm)"
+        f"shift=({bc['shift_x_mm']} mm, {bc['shift_y_mm']} mm), "
+        f"scale=({bc.get('scale_x', 1.0)}, {bc.get('scale_y', 1.0)})"
     )
 
 

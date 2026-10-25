@@ -9,7 +9,8 @@ The printer error is modelled as a rigid motion about the page centre c:
     d(P) = phi * J(P - c) + t,   J(x, y) = (-y, x)
 
 where phi (radians) is a clockwise rotation for Y-down coordinates and t a
-shift. The aligner corrects in BACK-page coordinates, which are mirrored in X
+shift (optionally also axis scales S, see fit_readings). The aligner
+corrects in BACK-page coordinates, which are mirrored in X
 with respect to the front view, so the X shift and the rotation keep their
 sign as corrections while the Y shift is negated (see to_back_corrections).
 """
@@ -39,6 +40,9 @@ class Fit:
     tx_mm: float  # right > 0
     ty_mm: float  # down > 0
     residuals_mm: Dict[str, float]  # per reading, distance to the model
+    scale_x: float = 1.0  # back size / front size along X (front view)
+    scale_y: float = 1.0
+    scale_fitted: bool = False
 
 
 def page_size_mm(paper: str, orientation: str) -> Point:
@@ -71,8 +75,14 @@ def predicted_offset(
     return (-phi * vy + tx_mm, phi * vx + ty_mm)
 
 
-def fit_readings(readings: Mapping[str, Point], width_mm: float, height_mm: float) -> Fit:
-    """Least-squares rotation + shift for the given readings (corners required)."""
+def fit_readings(
+    readings: Mapping[str, Point], width_mm: float, height_mm: float, fit_scale: bool = False
+) -> Fit:
+    """Least-squares rotation + shift (+ axis scales) for the readings (corners required).
+
+    With fit_scale the back is modelled as R(phi)·S(sx, sy) about the centre
+    plus a shift: an affine fit decomposed into rotation and axis scales.
+    """
     missing = [c for c in CORNERS if c not in readings]
     if missing:
         raise ValueError(f"missing readings: {', '.join(missing)}")
@@ -80,6 +90,9 @@ def fit_readings(readings: Mapping[str, Point], width_mm: float, height_mm: floa
     unknown = [k for k in readings if k not in pts]
     if unknown:
         raise ValueError(f"unknown reading names: {', '.join(unknown)}")
+
+    if fit_scale:
+        return _fit_affine(readings, pts, width_mm / 2, height_mm / 2)
 
     cx, cy = width_mm / 2, height_mm / 2
     n = len(readings)
@@ -105,6 +118,53 @@ def fit_readings(readings: Mapping[str, Point], width_mm: float, height_mm: floa
     return Fit(rot_deg=rot_deg, tx_mm=tx, ty_mm=ty, residuals_mm=residuals)
 
 
+def _fit_affine(readings: Mapping[str, Point], pts: Mapping[str, Point], cx: float, cy: float) -> Fit:
+    n = len(readings)
+    vs = {k: (pts[k][0] - cx, pts[k][1] - cy) for k in readings}
+    mvx = sum(v[0] for v in vs.values()) / n
+    mvy = sum(v[1] for v in vs.values()) / n
+    mdx = sum(d[0] for d in readings.values()) / n
+    mdy = sum(d[1] for d in readings.values()) / n
+    # A = (sum d v^T)(sum v v^T)^-1 with centred data
+    sxx = sxy = syy = 0.0
+    dxx = dxy = dyx = dyy = 0.0
+    for k, (dx, dy) in readings.items():
+        vx, vy = vs[k][0] - mvx, vs[k][1] - mvy
+        ex, ey = dx - mdx, dy - mdy
+        sxx += vx * vx
+        sxy += vx * vy
+        syy += vy * vy
+        dxx += ex * vx
+        dxy += ex * vy
+        dyx += ey * vx
+        dyy += ey * vy
+    det = sxx * syy - sxy * sxy
+    i11, i12, i22 = syy / det, -sxy / det, sxx / det
+    a11 = dxx * i11 + dxy * i12
+    a12 = dxx * i12 + dxy * i22
+    a21 = dyx * i11 + dyy * i12
+    a22 = dyx * i12 + dyy * i22
+    tx = mdx - (a11 * mvx + a12 * mvy)
+    ty = mdy - (a21 * mvx + a22 * mvy)
+    # B = I + A ≈ R(phi)·S: columns are the scaled, rotated axes
+    b11, b12, b21, b22 = 1 + a11, a12, a21, 1 + a22
+    sx = math.hypot(b11, b21)
+    sy = math.hypot(b12, b22)
+    phi = (math.atan2(b21, b11) + math.atan2(-b12, b22)) / 2
+
+    c, s_ = math.cos(phi), math.sin(phi)
+    residuals = {}
+    for k, (dx, dy) in readings.items():
+        vx, vy = vs[k]
+        px = c * sx * vx - s_ * sy * vy - vx + tx
+        py = s_ * sx * vx + c * sy * vy - vy + ty
+        residuals[k] = math.hypot(dx - px, dy - py)
+    return Fit(
+        rot_deg=math.degrees(phi), tx_mm=tx, ty_mm=ty, residuals_mm=residuals,
+        scale_x=sx, scale_y=sy, scale_fitted=True,
+    )
+
+
 def to_back_corrections(fit: Fit) -> Dict[str, float]:
     """Profile back_corrections that cancel the fitted error.
 
@@ -116,16 +176,32 @@ def to_back_corrections(fit: Fit) -> Dict[str, float]:
     of the shift is negated.
     """
     phi = math.radians(fit.rot_deg)
-    # s = -R(-phi) t, front view (R clockwise for Y down)
-    sx = -(fit.tx_mm * math.cos(phi) + fit.ty_mm * math.sin(phi))
-    sy = -(-fit.tx_mm * math.sin(phi) + fit.ty_mm * math.cos(phi))
-    return {
+    # s = -(R·S)^-1 t = -S^-1 R(-phi) t, front view (R clockwise for Y down)
+    sx = -(fit.tx_mm * math.cos(phi) + fit.ty_mm * math.sin(phi)) / fit.scale_x
+    sy = -(-fit.tx_mm * math.sin(phi) + fit.ty_mm * math.cos(phi)) / fit.scale_y
+    out = {
         "extra_rot_deg": fit.rot_deg,
         "shift_x_mm": -sx,
         "shift_y_mm": sy,
     }
+    if fit.scale_fitted:
+        # mirroring in X does not change an axis scale
+        out["scale_x"] = 1 / fit.scale_x
+        out["scale_y"] = 1 / fit.scale_y
+    return out
 
 
 def refine_corrections(base: Mapping[str, float], delta: Mapping[str, float]) -> Dict[str, float]:
-    """Add the correction computed from a verification print to a profile's corrections."""
-    return {k: float(base.get(k, 0.0)) + float(delta.get(k, 0.0)) for k in ("extra_rot_deg", "shift_x_mm", "shift_y_mm")}
+    """Combine a profile's corrections with those from a verification print.
+
+    Rotations and shifts add up; scales multiply. Scale keys are only present
+    when either side has them.
+    """
+    out = {
+        k: float(base.get(k, 0.0)) + float(delta.get(k, 0.0))
+        for k in ("extra_rot_deg", "shift_x_mm", "shift_y_mm")
+    }
+    for k in ("scale_x", "scale_y"):
+        if k in base or k in delta:
+            out[k] = float(base.get(k, 1.0)) * float(delta.get(k, 1.0))
+    return out

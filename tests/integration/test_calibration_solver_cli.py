@@ -123,3 +123,27 @@ def test_inconsistent_readings_warn(tmp_path: Path):
     proc = run_solver(args, tmp_path)
     assert proc.returncode == 0, proc.stderr
     assert "Warning" in proc.stderr
+
+
+# Readings of a back 0.5 % wider than the front (dx grows to the right)
+WIDER = [
+    "--top-left", "-0.4", "0",
+    "--top-right", "0.4", "0",
+    "--bottom-left", "-0.4", "0",
+    "--bottom-right", "0.4", "0",
+]
+
+
+def test_fit_scale_writes_scale_corrections(tmp_path: Path):
+    proc = run_solver([*WIDER, "--fit-scale", "--output", "-"], tmp_path)
+    assert proc.returncode == 0, proc.stderr
+    bc = json.loads(proc.stdout)["back_corrections"]
+    assert bc["scale_x"] == round(1 / 1.005, 4)
+    assert bc["scale_y"] == 1.0
+    assert bc["shift_x_mm"] == 0.0
+
+
+def test_without_fit_scale_no_scale_keys(tmp_path: Path):
+    proc = run_solver([*WIDER, "--output", "-"], tmp_path)
+    assert proc.returncode == 0, proc.stderr
+    assert "scale_x" not in json.loads(proc.stdout)["back_corrections"]

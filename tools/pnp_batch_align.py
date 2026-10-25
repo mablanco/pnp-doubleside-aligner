@@ -250,6 +250,10 @@ def build_worker_command(pdf, output, order, args):
         cmd += ["--shiftx", str(args.shiftx)]
     if args.shifty is not None:
         cmd += ["--shifty", str(args.shifty)]
+    if args.scalex is not None:
+        cmd += ["--scalex", str(args.scalex)]
+    if args.scaley is not None:
+        cmd += ["--scaley", str(args.scaley)]
 
     return cmd
 
@@ -289,6 +293,8 @@ def main():
     ap.add_argument("--rot", type=float, help="Override extra_rot_deg (degrees).")
     ap.add_argument("--shiftx", type=float, help="Override shift_x_mm (millimeters).")
     ap.add_argument("--shifty", type=float, help="Override shift_y_mm (millimeters).")
+    ap.add_argument("--scalex", type=float, help="Override scale_x (factor, e.g. 0.996).")
+    ap.add_argument("--scaley", type=float, help="Override scale_y (factor, e.g. 0.996).")
     ap.add_argument("--dpi", type=int, default=600, help="DPI for worker raster fallback.")
     ap.add_argument(
         "--script",

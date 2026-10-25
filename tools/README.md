@@ -42,7 +42,8 @@ python tools/pnp_calibration_sheet_duplex.py --orientation portrait --paper a4
 
 Turns the sheet readings into a profile (least-squares rotation + shift,
 mapped to back-page corrections). `--refine PROFILE` adds the residual of a
-verification print to an existing profile. Never overwrites a file unless
+verification print to an existing profile; `--fit-scale` also fits an X/Y
+scale difference between back and front. Never overwrites a file unless
 `--force` is given; `--output -` prints the JSON.
 
 ```bash
@@ -81,7 +82,8 @@ python tools/pnp_double_with_profile_img.py \
 ```
 
 If a `--back` is omitted for an index, the cropped front is duplicated as the
-back. Profile rotation/shift/flip apply to **backs only**. See
+back. Profile rotation/shift/flip apply to **backs only**; scale_x / scale_y are
+not supported by this experimental tool and are ignored. See
 `specs/003-image-tool-stack/contracts/image-tool-cli.md`.
 
 ### pnp_batch_align.py (**experimental**)

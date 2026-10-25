@@ -11,7 +11,13 @@ IDENTITY_BACK_CORRECTIONS: Dict[str, float] = {
     "extra_rot_deg": 0.0,
     "shift_x_mm": 0.0,
     "shift_y_mm": 0.0,
+    "scale_x": 1.0,
+    "scale_y": 1.0,
 }
+
+# Plausible duplex scale differences are well under 1 %; anything outside
+# this range is almost certainly a typo (e.g. a percentage instead of a factor).
+SCALE_RANGE = (0.9, 1.1)
 
 
 def default_profile() -> Dict[str, Any]:
@@ -25,11 +31,11 @@ def default_profile() -> Dict[str, Any]:
 
 
 def _validate_back_corrections(bc: MutableMapping[str, Any]) -> Dict[str, float]:
-    """Ensure correction axes are present and numeric; missing → 0."""
+    """Ensure correction axes are present and numeric; missing → identity."""
     out: Dict[str, float] = {}
-    for key in ("extra_rot_deg", "shift_x_mm", "shift_y_mm"):
+    for key, identity in IDENTITY_BACK_CORRECTIONS.items():
         if key not in bc:
-            out[key] = 0.0
+            out[key] = identity
             continue
         try:
             out[key] = float(bc[key])
@@ -37,6 +43,13 @@ def _validate_back_corrections(bc: MutableMapping[str, Any]) -> Dict[str, float]
             raise ValueError(
                 f"Invalid back_corrections.{key}={bc[key]!r}; expected a number."
             ) from exc
+    for key in ("scale_x", "scale_y"):
+        lo, hi = SCALE_RANGE
+        if not lo <= out[key] <= hi:
+            raise ValueError(
+                f"Invalid back_corrections.{key}={out[key]!r}; expected a factor "
+                f"between {lo} and {hi} (e.g. 0.996 to shrink the back by 0.4 %)."
+            )
     return out
 
 
@@ -98,6 +111,8 @@ def apply_cli_overrides(
     rot: Optional[float] = None,
     shiftx: Optional[float] = None,
     shifty: Optional[float] = None,
+    scalex: Optional[float] = None,
+    scaley: Optional[float] = None,
 ) -> Dict[str, Any]:
     """CLI correction flags win over profile axes when provided."""
     bc = profile.setdefault("back_corrections", dict(IDENTITY_BACK_CORRECTIONS))
@@ -107,4 +122,8 @@ def apply_cli_overrides(
         bc["shift_x_mm"] = float(shiftx)
     if shifty is not None:
         bc["shift_y_mm"] = float(shifty)
+    if scalex is not None:
+        bc["scale_x"] = float(scalex)
+    if scaley is not None:
+        bc["scale_y"] = float(scaley)
     return profile
