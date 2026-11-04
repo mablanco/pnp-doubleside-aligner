@@ -6,6 +6,6 @@
 #   pip install -e ".[img]"
 #   pip install -r requirements-img.txt
 # Do NOT -r this file from requirements.txt or requirements-dev.txt.
-opencv-python-headless==4.10.0.84
+opencv-python-headless==5.0.0.93
 numpy==2.4.6
 fpdf2==2.9.0
