@@ -47,7 +47,7 @@ def page_fingerprint(doc, idx, thumb=32, dpi=72):
     pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72.0, dpi / 72.0), alpha=False)
     img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
     img = img.convert("L").resize((thumb, thumb), Image.BILINEAR)
-    vec = list(img.getdata())
+    vec = list(img.get_flattened_data())
     # Normalization
     m = sum(vec) / len(vec)
     var = sum((x - m) ** 2 for x in vec) / len(vec)

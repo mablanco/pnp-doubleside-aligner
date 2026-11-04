@@ -55,7 +55,7 @@ locally by `specify init` and are not committed).
   as backs for the chosen page-order mode; fronts stay unmodified.
 - **Vector-First**: Prefer vector PDF paths; raster only when forced or as
   documented fallback, with explicit DPI/quality controls.
-- **Practical Simplicity**: Python 3.9+ with PyMuPDF / ReportLab / Pillow
+- **Practical Simplicity**: Python 3.11+ with PyMuPDF / ReportLab / Pillow
   unless justified; no new dependencies without plan approval; prefer
   typed code on new/edited surfaces.
 - **Geometric Precision**: Changes to matrices, coordinates, units, or
