@@ -24,7 +24,7 @@ dev = ["pytest==7.4.4"]
 # Mirror: requirements-img.txt — keep pins in sync.
 img = [
     "opencv-python-headless==4.10.0.84",
-    "numpy==1.26.4",
+    "numpy==2.4.6",
     "fpdf2==2.9.0",
 ]
 
