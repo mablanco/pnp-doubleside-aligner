@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest==7.4.4"]
+dev = ["pytest==9.2.0"]
 # Experimental image tool (tools/pnp_double_with_profile_img.py).
 # Mirror: requirements-img.txt — keep pins in sync.
 img = [
