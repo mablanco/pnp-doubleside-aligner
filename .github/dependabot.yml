@@ -9,10 +9,10 @@ updates:
       pip-minor-and-patch:
         update-types: ["minor", "patch"]
     ignore:
-      # Pinned to the 1.23 series verified by the calibration/transform
-      # audit; moving off it needs that verification again.
+      # Pinned to 1.23.7, verified by the calibration/transform audit. Even
+      # 1.23.26 changes the golden PDF outputs (#21), so any update needs
+      # that verification again and is done by hand.
       - dependency-name: "PyMuPDF"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
