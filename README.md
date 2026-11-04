@@ -51,7 +51,7 @@ template customizations live under `.specify/templates/overrides/`.
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.11+
 
 It is strongly recommended to use a **virtual environment (venv)** to avoid interfering
 with system-wide Python packages.
@@ -120,7 +120,7 @@ After `pip install -e ".[dev]"`:
 python -m pytest tests/ -v
 ```
 
-Pull requests to `main` run the same suite on GitHub Actions (Python 3.9 and 3.12)
+Pull requests to `main` run the same suite on GitHub Actions (Python 3.11 and 3.12)
 via editable install with the `dev` extra. `main` requires a green `ci-success`
 check before merge.
 

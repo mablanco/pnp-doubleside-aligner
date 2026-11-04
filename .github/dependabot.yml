@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # pyproject.toml and the requirements*.txt mirrors, updated together
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      pip-minor-and-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      # Pinned to the 1.23 series verified by the calibration/transform
+      # audit; moving off it needs that verification again.
+      - dependency-name: "PyMuPDF"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]

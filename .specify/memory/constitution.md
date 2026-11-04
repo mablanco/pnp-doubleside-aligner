@@ -1,5 +1,17 @@
 <!--
 Sync Impact Report
+- Version change: 1.3.0 → 1.4.0 (MINOR: Python floor raised to 3.11)
+- Modified principles:
+  - V. Practical Simplicity → Python 3.11+ (Pillow 13, which fixes the
+    known Pillow vulnerabilities, requires it; Python 3.9 and 3.10 are
+    end of life)
+  - Governance / Compatibility → Python 3.11+
+- Templates / docs requiring updates:
+  - .specify/templates/overrides/plan-template.md ✅ Python 3.11+
+  - README.md ✅ requirements and CI versions
+  - pyproject.toml, requirements*.txt, CI ✅
+
+Previous report:
 - Version change: 1.2.1 → 1.3.0 (MINOR: Spec Kit tooling vs project-state split)
 - Modified principles:
   - VIII. Repository Hygiene & Secrets → ignore specify-init regenerables;
@@ -86,7 +98,7 @@ bloats files and softens linework.
 ### V. Practical Simplicity
 
 Prefer the smallest change that solves a real duplex-alignment problem.
-The supported stack is Python 3.9+ with PyMuPDF (`fitz`), ReportLab, and
+The supported stack is Python 3.11+ with PyMuPDF (`fitz`), ReportLab, and
 Pillow unless a feature plan explicitly justifies a change. New external
 dependencies MUST NOT be added unless strictly necessary and approved in
 the implementation plan (Complexity Tracking when the addition increases
@@ -96,7 +108,7 @@ layouts without that justification. Mark experimental helpers clearly under
 (`pnp_double_with_profile_pdf.py`) focused on the common path.
 
 New and substantially edited code SHOULD use static typing (`typing` /
-annotations) consistent with Python 3.9+.
+annotations) consistent with Python 3.11+.
 
 **Rationale**: This is a focused MIT utility, not a platform; extra
 dependencies and untyped churn hurt calibrators and maintainers.
@@ -172,7 +184,7 @@ version project intent, not every file `specify init` can recreate.
   are documentation aids and MUST be copied/stripped before use. Only
   `profiles/base_printer_profile.json` and `profiles/example_printer.json`
   are the canonical tracked examples unless a plan adds more intentionally.
-- **Compatibility**: Target Python 3.9+ unless a constitution amendment
+- **Compatibility**: Target Python 3.11+ unless a constitution amendment
   raises the floor.
 - **Licensing**: Contributions remain under the MIT License; keep copyright
   and license notices intact.
@@ -216,4 +228,4 @@ simplicity MUST be recorded in the plan's Complexity Tracking table with
 justification. Runtime guidance for operators lives in `README.md` and
 `docs/calibration_guide.md`; this file governs how the project evolves.
 
-**Version**: 1.3.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25
+**Version**: 1.4.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-11-04

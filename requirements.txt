@@ -2,5 +2,5 @@
 # Convenience mirror of [project].dependencies in pyproject.toml — keep pins in sync.
 # Pinned to versions verified against the calibration/transform audit (PyMuPDF 1.23.x).
 PyMuPDF==1.23.7
-Pillow==10.2.0
+Pillow==13.0.0
 reportlab==4.1.0
