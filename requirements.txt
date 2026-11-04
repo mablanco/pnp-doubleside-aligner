@@ -3,4 +3,4 @@
 # Pinned to versions verified against the calibration/transform audit (PyMuPDF 1.23.x).
 PyMuPDF==1.23.7
 Pillow==13.0.0
-reportlab==4.1.0
+reportlab==5.1.0
