@@ -295,17 +295,15 @@ def raster_fallback(
 
     out_dir = os.path.dirname(os.path.abspath(out_path)) or "."
     os.makedirs(out_dir, exist_ok=True)
-    same_file = os.path.abspath(in_path) == os.path.abspath(out_path)
-
-    if same_file:
-        fd, write_path = tempfile.mkstemp(
-            prefix=os.path.basename(out_path) + ".tmp.",
-            suffix=".pdf",
-            dir=out_dir,
-        )
-        os.close(fd)
-    else:
-        write_path = out_path
+    # Always render into a private temp file and swap it in with os.replace:
+    # this covers the same-file case and never follows a symlink planted at
+    # out_path (ReportLab opens its target with a plain open(path, "wb")).
+    fd, write_path = tempfile.mkstemp(
+        prefix=os.path.basename(out_path) + ".tmp.",
+        suffix=".pdf",
+        dir=out_dir,
+    )
+    os.close(fd)
 
     src = fitz.open(in_path)
     canv = None
@@ -336,20 +334,19 @@ def raster_fallback(
                 jpeg_quality=jpeg_quality,
             )
 
-        if canv:
-            canv.save()
-
-        if same_file:
-            final_path = safe_replace_file(write_path, out_path)
-        else:
-            final_path = write_path
+        if canv is None:
+            # Nothing rendered: keep any existing output untouched.
+            os.remove(write_path)
+            return out_path
+        canv.save()
+        final_path = safe_replace_file(write_path, out_path)
 
         print(f"Saved (raster JPEG {jpeg_quality} at {dpi} dpi): {final_path}")
         return final_path
 
     except BaseException:
-        # Never leave the same-file temp behind when rendering fails.
-        if same_file and os.path.exists(write_path):
+        # Never leave the temp file behind when rendering fails.
+        if os.path.exists(write_path):
             os.remove(write_path)
         raise
 
