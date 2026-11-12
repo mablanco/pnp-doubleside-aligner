@@ -143,13 +143,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(text)
     else:
         out = Path(args.output)
-        if out.exists() and not args.force:
+        try:
+            out.parent.mkdir(parents=True, exist_ok=True)
+            # "x" creates the file atomically, so an existing profile is never
+            # clobbered between the existence check and the write.
+            with open(out, "w" if args.force else "x", encoding="utf-8") as f:
+                f.write(text + "\n")
+        except FileExistsError:
             print(f"Error: {out} already exists. Use --force to overwrite it or choose another --output.",
                   file=sys.stderr)
             return 1
-        try:
-            out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_text(text + "\n", encoding="utf-8")
         except OSError as exc:
             print(f"Error: cannot write {out}: {exc}", file=sys.stderr)
             return 1

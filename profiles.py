@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 from typing import Any, Dict, MutableMapping, Optional
 
@@ -43,6 +44,10 @@ def _validate_back_corrections(bc: MutableMapping[str, Any]) -> Dict[str, float]
             raise ValueError(
                 f"Invalid back_corrections.{key}={bc[key]!r}; expected a number."
             ) from exc
+        if not math.isfinite(out[key]):
+            raise ValueError(
+                f"Invalid back_corrections.{key}={bc[key]!r}; expected a finite number."
+            )
     for key in ("scale_x", "scale_y"):
         lo, hi = SCALE_RANGE
         if not lo <= out[key] <= hi:

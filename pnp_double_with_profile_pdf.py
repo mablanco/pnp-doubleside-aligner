@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 import tempfile
@@ -346,6 +347,12 @@ def raster_fallback(
         print(f"Saved (raster JPEG {jpeg_quality} at {dpi} dpi): {final_path}")
         return final_path
 
+    except BaseException:
+        # Never leave the same-file temp behind when rendering fails.
+        if same_file and os.path.exists(write_path):
+            os.remove(write_path)
+        raise
+
     finally:
         try:
             src.close()
@@ -373,6 +380,32 @@ def _scale_arg(value: str) -> float:
     if not lo <= factor <= hi:
         raise argparse.ArgumentTypeError(f"scale factor must be between {lo} and {hi}, got {factor}")
     return factor
+
+
+def _finite_arg(value: str) -> float:
+    """argparse type for --rot/--shiftx/--shifty: any finite number."""
+    try:
+        number = float(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"invalid number: {value!r}") from None
+    if not math.isfinite(number):
+        raise argparse.ArgumentTypeError(f"expected a finite number, got {value!r}")
+    return number
+
+
+DPI_RANGE = (36, 1200)
+
+
+def _dpi_arg(value: str) -> int:
+    """argparse type for --dpi: an integer within DPI_RANGE."""
+    try:
+        dpi = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"invalid dpi: {value!r}") from None
+    lo, hi = DPI_RANGE
+    if not lo <= dpi <= hi:
+        raise argparse.ArgumentTypeError(f"dpi must be between {lo} and {hi}, got {dpi}")
+    return dpi
 
 
 def _fail(message: str, code: int = 1) -> None:
@@ -415,9 +448,9 @@ def main() -> None:
         choices=["long", "short"],
         help="Override the duplex flip mode.",
     )
-    ap.add_argument("--rot", type=float, help="Override extra_rot_deg (degrees).")
-    ap.add_argument("--shiftx", type=float, help="Override shift_x_mm (millimeters).")
-    ap.add_argument("--shifty", type=float, help="Override shift_y_mm (millimeters).")
+    ap.add_argument("--rot", type=_finite_arg, help="Override extra_rot_deg (degrees).")
+    ap.add_argument("--shiftx", type=_finite_arg, help="Override shift_x_mm (millimeters).")
+    ap.add_argument("--shifty", type=_finite_arg, help="Override shift_y_mm (millimeters).")
     ap.add_argument("--scalex", type=_scale_arg, help="Override scale_x (factor, e.g. 0.996).")
     ap.add_argument("--scaley", type=_scale_arg, help="Override scale_y (factor, e.g. 0.996).")
     ap.add_argument(
@@ -433,9 +466,9 @@ def main() -> None:
     )
     ap.add_argument(
         "--dpi",
-        type=int,
+        type=_dpi_arg,
         default=300,
-        help="DPI for raster fallback (default: 300).",
+        help="DPI for raster fallback (36–1200, default: 300).",
     )
     ap.add_argument(
         "--jpeg-quality",
