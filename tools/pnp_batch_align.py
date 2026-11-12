@@ -6,10 +6,12 @@ and detects the page order per PDF using visual heuristics when
 --auto-detect-smart is enabled.
 
 This script uses pnp_double_with_profile_pdf.py as a worker
-(by default, located in the same directory).
+(by default, the one in the repository root next to tools/), run with the
+same Python interpreter as this script.
 """
 
 import os, argparse, glob, subprocess, re, math, sys
+from pathlib import Path
 import fitz  # PyMuPDF
 from PIL import Image
 
@@ -33,6 +35,12 @@ def name_hint_to_order(name):
             return order
     return None
 
+DEFAULT_WORKER = Path(__file__).resolve().parents[1] / "pnp_double_with_profile_pdf.py"
+
+# Longest rendered side for fingerprints; the result is resized to `thumb`
+# anyway, so this only bounds memory on PDFs with huge page boxes.
+MAX_FINGERPRINT_PX = 1024
+
 # ----------------- Visual fingerprints -----------------
 def page_fingerprint(doc, idx, thumb=32, dpi=72):
     """
@@ -43,8 +51,10 @@ def page_fingerprint(doc, idx, thumb=32, dpi=72):
     (mean and variance normalization) for robustness.
     """
     page = doc[idx]
-    # Lightweight render: factor 1.0 ≈ 72 dpi
-    pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72.0, dpi / 72.0), alpha=False)
+    # Lightweight render: factor 1.0 ≈ 72 dpi, capped at MAX_FINGERPRINT_PX
+    longest = max(page.rect.width, page.rect.height, 1.0)
+    zoom = min(dpi / 72.0, MAX_FINGERPRINT_PX / longest)
+    pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
     img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
     img = img.convert("L").resize((thumb, thumb), Image.BILINEAR)
     vec = list(img.get_flattened_data())
@@ -232,7 +242,7 @@ def build_worker_command(pdf, output, order, args):
     Build the command line for the worker alignment script.
     """
     cmd = [
-        "python3", args.script,
+        sys.executable, args.script,
         "--input", pdf,
         "--output", output,
         "--order", order,
@@ -298,14 +308,14 @@ def main():
     ap.add_argument("--dpi", type=int, default=600, help="DPI for worker raster fallback.")
     ap.add_argument(
         "--script",
-        default="pnp_double_with_profile_pdf.py",
-        help="Path to the individual alignment script."
+        default=str(DEFAULT_WORKER),
+        help="Path to the individual alignment script (default: the repository's main aligner)."
     )
     ap.add_argument("--verbose", action="store_true", help="Show visual similarity metrics.")
     args = ap.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
-    pdfs = sorted(glob.glob(os.path.join(args.input_dir, "*.pdf")))
+    pdfs = sorted(glob.glob(os.path.join(glob.escape(args.input_dir), "*.pdf")))
     if not pdfs:
         print("No PDFs found in the input directory.")
         return
@@ -314,7 +324,13 @@ def main():
     for pdf in pdfs:
         name = os.path.basename(pdf)
 
-        order, why = determine_order(pdf, args)
+        try:
+            order, why = determine_order(pdf, args)
+        except Exception as exc:
+            # One unreadable PDF must not abort the rest of the batch.
+            failures += 1
+            print(f"Cannot open {name}: {exc}", file=sys.stderr)
+            continue
         print(f"{name}: order='{order}' ({why})")
 
         out_name = os.path.splitext(name)[0] + f"_{order}_aligned.pdf"

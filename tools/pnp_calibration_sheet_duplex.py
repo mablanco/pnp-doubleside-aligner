@@ -136,9 +136,17 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(argv)
     out = Path(args.output or f"calibration_sheet_{args.orientation}_{args.paper}.pdf")
-    if out.exists() and not args.force:
-        print(f"Error: {out} already exists. Use --force to overwrite it.", file=sys.stderr)
-        return 1
+    if not args.force:
+        # Reserve the name atomically so an existing file is never clobbered
+        # between the existence check and ReportLab writing the PDF.
+        try:
+            out.open("x").close()
+        except FileExistsError:
+            print(f"Error: {out} already exists. Use --force to overwrite it.", file=sys.stderr)
+            return 1
+        except OSError as exc:
+            print(f"Error: cannot write {out}: {exc}", file=sys.stderr)
+            return 1
     sheet = Sheet(args.paper, args.orientation)
     try:
         c = canvas.Canvas(str(out), pagesize=(sheet.pw, sheet.ph))

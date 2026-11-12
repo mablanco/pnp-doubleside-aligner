@@ -16,7 +16,7 @@ python pnp_double_with_profile_pdf.py \
   [--flip-mode long|short] \
   [--rot <deg>] [--shiftx <mm>] [--shifty <mm>] \
   [--mode auto|vector|raster] \
-  [--dpi <int>] [--jpeg-quality <1-95>]
+  [--dpi <36-1200>] [--jpeg-quality <1-95>]
 ```
 
 Progress and success summaries → **stdout**.  

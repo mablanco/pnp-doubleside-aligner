@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 import tempfile
@@ -80,18 +81,36 @@ def load_profile(path: str) -> Dict[str, Any]:
     paper = prof.get("paper", {})
     margins = prof.get("margins", {})
     back = prof.get("back_corrections", {})
+    for section, value in (("paper", paper), ("margins", margins), ("back_corrections", back)):
+        if not isinstance(value, dict):
+            raise ValueError(f"{section} must be a JSON object.")
 
-    return {
-        "paper_w": float(paper.get("width_mm", 297.0)),
-        "paper_h": float(paper.get("height_mm", 210.0)),
+    def number(section: str, mapping: Dict[str, Any], key: str, default: float) -> float:
+        raw = mapping.get(key, default)
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid {section}.{key}={raw!r}; expected a number.") from exc
+        if not math.isfinite(value):
+            raise ValueError(f"Invalid {section}.{key}={raw!r}; expected a finite number.")
+        return value
+
+    out = {
+        "paper_w": number("paper", paper, "width_mm", 297.0),
+        "paper_h": number("paper", paper, "height_mm", 210.0),
         "orientation": paper.get("orientation", "landscape"),
-        "margin_x": float(margins.get("x_mm", 0.0)),
-        "margin_y": float(margins.get("y_mm", 0.0)),
+        "margin_x": number("margins", margins, "x_mm", 0.0),
+        "margin_y": number("margins", margins, "y_mm", 0.0),
         "flip_mode": prof.get("flip_mode", "long"),
-        "rot_deg": float(back.get("extra_rot_deg", 0.0)),
-        "shift_x": float(back.get("shift_x_mm", 0.0)),
-        "shift_y": float(back.get("shift_y_mm", 0.0)),
+        "rot_deg": number("back_corrections", back, "extra_rot_deg", 0.0),
+        "shift_x": number("back_corrections", back, "shift_x_mm", 0.0),
+        "shift_y": number("back_corrections", back, "shift_y_mm", 0.0),
     }
+    if out["paper_w"] <= 0 or out["paper_h"] <= 0:
+        raise ValueError("paper.width_mm and paper.height_mm must be positive.")
+    if out["margin_x"] < 0 or out["margin_y"] < 0:
+        raise ValueError("margins.x_mm and margins.y_mm must not be negative.")
+    return out
 
 
 def read_bgr(path: str):
