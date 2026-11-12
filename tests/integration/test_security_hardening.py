@@ -160,3 +160,74 @@ def test_img_tool_profile_defaults_unchanged(tmp_path: Path):
     path.write_text("{}", encoding="utf-8")
     prof = img_tool.load_profile(str(path))
     assert (prof["paper_w"], prof["paper_h"], prof["orientation"]) == (297.0, 210.0, "landscape")
+
+
+# ------------------------ output symlink (raster path) -------------------------
+
+
+def _blank_two_page_pdf(path: Path) -> None:
+    """Pages without /Contents: show_pdf_page refuses them, forcing raster."""
+    doc = fitz.open()
+    doc.new_page()
+    doc.new_page()
+    doc.save(str(path))
+    doc.close()
+
+
+def _victim(tmp_path: Path) -> Path:
+    victim = tmp_path / "victim.txt"
+    victim.write_text("KEEP", encoding="utf-8")
+    return victim
+
+
+def test_raster_output_does_not_follow_planted_symlink(run_main_cli, sample_interleaved: Path, tmp_path: Path):
+    victim = _victim(tmp_path)
+    out_dir = tmp_path / "out"
+    out_dir.mkdir()
+    out = out_dir / "deck.pdf"
+    out.symlink_to(victim)
+
+    proc = run_main_cli(
+        ["--input", str(sample_interleaved), "--output", str(out), "--mode", "raster", "--dpi", "72"]
+    )
+
+    assert proc.returncode == 0, proc.stderr + proc.stdout
+    assert victim.read_text(encoding="utf-8") == "KEEP"
+    assert not out.is_symlink()
+    assert out.read_bytes().startswith(b"%PDF")
+
+
+def test_batch_forced_raster_fallback_does_not_follow_planted_symlink(run_batch, tmp_path: Path):
+    """A downloaded folder used as --output-dir cannot redirect the write."""
+    victim = _victim(tmp_path)
+    folder = tmp_path / "downloaded"
+    folder.mkdir()
+    _blank_two_page_pdf(folder / "a.pdf")
+    planted = folder / "a_interleaved_aligned.pdf"
+    planted.symlink_to(victim)
+
+    proc = run_batch(["--input-dir", str(folder), "--output-dir", str(folder), "--dpi", "72"])
+
+    assert "falling back to compressed raster output" in proc.stderr
+    assert victim.read_text(encoding="utf-8") == "KEEP"
+    assert not planted.is_symlink()
+
+
+def test_safe_replace_copy_fallback_does_not_follow_symlink(tmp_path: Path, monkeypatch):
+    import io_pdf
+
+    victim = _victim(tmp_path)
+    dest = tmp_path / "out.pdf"
+    dest.symlink_to(victim)
+    src = tmp_path / "new.pdf"
+    src.write_bytes(b"%PDF-new")
+
+    def no_replace(*_a, **_k):
+        raise OSError("locked")
+
+    monkeypatch.setattr(io_pdf.os, "replace", no_replace)
+    io_pdf.safe_replace_file(str(src), str(dest))
+
+    assert victim.read_text(encoding="utf-8") == "KEEP"
+    assert not dest.is_symlink()
+    assert dest.read_bytes() == b"%PDF-new"

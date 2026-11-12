@@ -52,6 +52,9 @@ def safe_replace_file(src_tmp: str, dest_path: str) -> str:
     try:
         os.replace(src_tmp, dest_path)
     except OSError:
+        # copy2 would write through a symlink at dest_path; drop the link first.
+        if os.path.islink(dest_path):
+            os.remove(dest_path)
         shutil.copy2(src_tmp, dest_path)
         os.remove(src_tmp)
     return dest_path
