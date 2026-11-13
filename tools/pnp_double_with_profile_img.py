@@ -411,8 +411,6 @@ def run(args: argparse.Namespace) -> int:
             )
 
         pdf.output(args.output)
-    except SystemExit:
-        raise
     except OSError as exc:
         _fail(f"Could not write output PDF {args.output!r}: {exc}")
     except (ValueError, TypeError) as exc:
