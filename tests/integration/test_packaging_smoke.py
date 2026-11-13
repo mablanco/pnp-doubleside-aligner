@@ -48,18 +48,7 @@ def test_pnp_double_align_help_via_console_script_or_module() -> None:
 def test_default_dependencies_exclude_image_extras() -> None:
     """SC-004 / FR-005: default deps must not require opencv or fpdf."""
     text = _load_pyproject_text().lower()
-    # Locate [project] dependencies block roughly; fail if opencv/fpdf appear
-    # as required (not merely mentioned in comments under optional-deps).
-    # Split on optional-dependencies so comments there are allowed.
+    # The img extra may list opencv/fpdf; everything before it must not.
     main_part = text.split("[project.optional-dependencies]", 1)[0]
     assert "opencv" not in main_part
     assert "fpdf" not in main_part
-    # Optional img extra may list opencv/fpdf; that is ok under optional-deps.
-    if "[project.optional-dependencies]" in text:
-        # Ensure opencv is not in the unscoped dependencies list lines.
-        for line in main_part.splitlines():
-            stripped = line.strip()
-            if stripped.startswith("#"):
-                continue
-            assert "opencv" not in stripped
-            assert "fpdf" not in stripped

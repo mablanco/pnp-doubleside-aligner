@@ -32,12 +32,7 @@ def test_golden_outputs_match(
     if not golden.is_file() or golden.stat().st_size == 0:
         pytest.skip(f"golden missing or empty: {golden} (run generate_goldens.py after fixes)")
 
-    args = list(extra_args)
-    args = [
-        profile_nonzero if a == "PROFILE_NONZERO" else a for a in args
-    ]
-    # stringify paths
-    args = [str(a) if isinstance(a, Path) else a for a in args]
+    args = [str(profile_nonzero) if a == "PROFILE_NONZERO" else a for a in extra_args]
 
     out = tmp_output / golden_name
     proc = run_main_cli(
