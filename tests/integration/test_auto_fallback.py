@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
+import sys
+from io import StringIO
 from pathlib import Path
-from unittest import mock
 
 import pnp_double_with_profile_pdf as mod
 
@@ -24,8 +26,6 @@ def test_auto_fallback_stderr_and_raster_output(
     monkeypatch.setattr(mod, "process_pdf_vector", boom)
 
     # Invoke via importable main path so monkeypatch applies
-    import sys
-
     argv = [
         "pnp_double_with_profile_pdf.py",
         "--input",
@@ -44,10 +44,6 @@ def test_auto_fallback_stderr_and_raster_output(
         "50",
     ]
     monkeypatch.setattr(sys, "argv", argv)
-
-    # Capture stderr from main
-    from io import StringIO
-    import contextlib
 
     err = StringIO()
     with contextlib.redirect_stderr(err):

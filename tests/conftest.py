@@ -143,9 +143,3 @@ def run_img_cli():
 @pytest.fixture
 def img_fixtures_dir(fixtures_dir: Path) -> Path:
     return fixtures_dir / "img"
-
-
-# Wire PDF compare helper for golden tests (T024)
-from tests.helpers.pdf_compare import pdfs_equivalent  # noqa: E402
-
-__all__ = ["pdfs_equivalent", "run_cli", "run_batch_cli", "run_img_tool"]
