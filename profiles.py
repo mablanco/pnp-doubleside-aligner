@@ -65,7 +65,7 @@ def load_profile(path: Optional[str]) -> Dict[str, Any]:
     - path is None → identity corrections
     - path missing → FileNotFoundError
     - invalid / comment-bearing JSON → json.JSONDecodeError (or ValueError)
-    - partial back_corrections → missing axes are 0
+    - partial back_corrections → missing axes are identity
     """
     prof = default_profile()
 
@@ -100,12 +100,7 @@ def load_profile(path: Optional[str]) -> Dict[str, Any]:
         bc = data["back_corrections"]
         if not isinstance(bc, dict):
             raise ValueError("back_corrections must be a JSON object.")
-        # Start from identity, then overlay provided keys (validated)
-        merged = dict(IDENTITY_BACK_CORRECTIONS)
-        merged.update(bc)
-        prof["back_corrections"] = _validate_back_corrections(merged)
-    else:
-        prof["back_corrections"] = dict(IDENTITY_BACK_CORRECTIONS)
+        prof["back_corrections"] = _validate_back_corrections(bc)
 
     return prof
 

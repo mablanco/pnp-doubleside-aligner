@@ -131,15 +131,12 @@ def process_pdf_vector(
         total_eff = effective_total(total, order, on_odd)
 
         for i in range(total_eff):
-            if i < total:
-                rect = src[i].rect
-            else:
-                rect = src[-1].rect
-
             if i >= total:
+                rect = src[-1].rect
                 out.new_page(width=rect.width, height=rect.height)
                 continue
 
+            rect = src[i].rect
             if not is_back_page(i, total_eff, order):
                 copy_pdf_page(out, src, i, rect)
             else:
@@ -509,7 +506,7 @@ def main() -> None:
     try:
         if args.mode == "vector":
             try:
-                ok = process_pdf_vector(
+                process_pdf_vector(
                     args.input,
                     args.output,
                     profile,
@@ -519,8 +516,6 @@ def main() -> None:
                 )
             except (TypeError, RuntimeError, OSError, ValueError) as exc:
                 _fail(f"Vector mode failed: {exc}")
-            if not ok:
-                _fail("Vector mode failed. No output was generated.")
 
         elif args.mode == "raster":
             raster_fallback(
@@ -561,8 +556,6 @@ def main() -> None:
                     jpeg_quality=args.jpeg_quality,
                 )
 
-    except SystemExit:
-        raise
     except Exception as exc:
         _fail(f"Unexpected error while processing PDF: {exc}")
 
