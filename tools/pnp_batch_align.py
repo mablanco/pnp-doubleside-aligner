@@ -190,14 +190,8 @@ def detect_order_smart(pdf_path, even_default='interleaved', verbose=False):
         odd_idxs = [i for i in indices if i % 2 == 1]
         second_idxs = [i for i in indices if i >= half]
 
-        # fps list indexed by page number for avg_sim_indices
-        max_idx = max(indices) if indices else -1
-        fps = [None] * (max_idx + 1)
-        for i, fp in fps_by_page.items():
-            fps[i] = fp
-
-        sim_odd_cluster = avg_sim_indices(fps, odd_idxs)
-        sim_second_half_cluster = avg_sim_indices(fps, second_idxs)
+        sim_odd_cluster = avg_sim_indices(fps_by_page, odd_idxs)
+        sim_second_half_cluster = avg_sim_indices(fps_by_page, second_idxs)
 
         if verbose:
             print(
@@ -230,10 +224,9 @@ def determine_order(pdf, args):
     with fitz.open(pdf) as d:
         total = len(d)
 
-    if total <= 1:
-        return "single_sided", "pages:1"
-    if total % 2 == 1:
-        return "last_back", f"pages:odd({total})"
+    order, reason = detect_order_by_page_count(total)
+    if order:
+        return order, reason
 
     return args.even_default, f"pages:even({total})->{args.even_default}"
 
