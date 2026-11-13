@@ -295,9 +295,8 @@ def raster_fallback(
 
     out_dir = os.path.dirname(os.path.abspath(out_path)) or "."
     os.makedirs(out_dir, exist_ok=True)
-    # Always render into a private temp file and swap it in with os.replace:
-    # this covers the same-file case and never follows a symlink planted at
-    # out_path (ReportLab opens its target with a plain open(path, "wb")).
+    # Render to a temp file and os.replace it in: ReportLab's open(path, "wb")
+    # would follow a symlink at out_path.
     fd, write_path = tempfile.mkstemp(
         prefix=os.path.basename(out_path) + ".tmp.",
         suffix=".pdf",
@@ -345,7 +344,6 @@ def raster_fallback(
         return final_path
 
     except BaseException:
-        # Never leave the temp file behind when rendering fails.
         if os.path.exists(write_path):
             os.remove(write_path)
         raise
